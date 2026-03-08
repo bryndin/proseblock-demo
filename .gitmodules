@@ -1,0 +1,3 @@
+[submodule "themes/theme-x"]
+	path = themes/theme-x
+	url = /home/db/projects/theme-x
