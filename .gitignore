@@ -1,0 +1,14 @@
+.hugo_build.lock
+.DS_Store
+.vscode/
+.idea/
+
+public/
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
