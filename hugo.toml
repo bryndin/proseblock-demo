@@ -1,0 +1,5 @@
+baseURL = "http://localhost/"
+languageCode = "en-us"
+title = "Theme X Demo"
+
+theme = "theme-x"
