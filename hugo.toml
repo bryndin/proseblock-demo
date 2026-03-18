@@ -1,5 +1,128 @@
-baseURL = "http://localhost/"
+# ==============================================================================
+# BASE CONFIGURATION
+# ==============================================================================
+baseURL = "https://example.com/"
+title = "Theme X"
 languageCode = "en-us"
-title = "Theme X Demo"
-
 theme = "theme-x"
+paginate = 10
+summaryLength = 30
+
+# Enable output formats required for Search (FR-04) and RSS (FR-25)
+[outputs]
+  home = ["HTML", "RSS", "JSON"]
+  section = ["HTML", "RSS"]
+  taxonomy = ["HTML", "RSS"]
+  term = ["HTML", "RSS"]
+
+# ==============================================================================
+# TAXONOMIES (Resolves IA Sec 10 & 16)
+# ==============================================================================
+# Mapping Authors and Series as taxonomies allows Hugo to natively handle 
+# routing, lists, and metadata via "_index.md" files in their respective folders.
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+  author = "authors"
+  series = "series"
+
+# ==============================================================================
+# MARKDOWN & RICH CONTENT (FR-09)
+# ==============================================================================
+[markup.goldmark.renderer]
+  unsafe = true # Required to render raw HTML for embedded media/complex tables
+[markup.goldmark.extensions]
+  linkify = true
+  footnotes = true
+  typographer = true
+[markup.highlight]
+  codeFences = true
+  guessSyntax = true
+  # lineNos = true
+  noClasses = false # Allows theme to style code blocks via CSS variables for Dark/Light mode
+
+# ==============================================================================
+# THEME PARAMETERS / MODULE TOGGLES (FR-34 & FR-35)
+# ==============================================================================
+[params]
+  description = "A modern, content-first Hugo theme for technical writing and publishing."
+  
+  # Identity & Trust (FR-21)
+  dateFormat = "Jan 2, 2006"
+  showUpdatedDate = true
+  
+  # Platform Basics (FR-29)
+  defaultTheme = "system" # Options: "light", "dark", "system"
+
+  # --------------------------------------------------------------------------
+  # Reusable Module Toggles (M-01 to M-17)
+  # --------------------------------------------------------------------------
+  
+  # Discovery (Search FR-04)
+  enableSearch = true      # Toggles search UI in header
+  
+  # Reading Experience (FR-12)
+  enableReadingTime = true
+  enableTOC = true
+  enableReadingProgress = true
+  enableBackToTop = true
+  
+  # Exploration (FR-14, FR-15, FR-16)
+  enableRelatedPosts = true
+  enablePreviousNext = true
+  enableSeriesNavigation = true
+  enableAuthorBlock = true 
+
+  # Engagement (FR-24, FR-26, FR-28)
+  enableComments = false   # Set to true to load external comment system partial
+  enableSharing = true
+  enableNewsletter = true
+
+  # --------------------------------------------------------------------------
+  # Specific Feature Configurations
+  # --------------------------------------------------------------------------
+  [params.newsletter]
+    provider = "generic"   # generic, mailchimp, buttondown
+    endpoint = "YOUR_ENDPOINT_URL"
+    frequencyText = "One email a month. No spam."
+
+  [params.social]
+    twitter = "yourusername"
+    github = "yourusername"
+    rss = true
+
+  [params.archive]
+    groupBy = "year"       # Options: "year", "year-month"
+
+# ==============================================================================
+# MENUS (IA Sec 4)
+# ==============================================================================
+[[menu.main]]
+  name = "Home"
+  url = "/"
+  weight = 10
+
+[[menu.main]]
+  name = "Articles"
+  url = "/posts/"
+  weight = 20
+
+[[menu.main]]
+  name = "Categories"
+  url = "/categories/"
+  weight = 30
+
+[[menu.main]]
+  name = "Search"
+  url = "/search/" # Or trigger overlay via JS
+  weight = 40
+
+[[menu.footer]]
+  name = "Privacy Policy"
+  url = "/privacy/"
+  weight = 10
+
+[[menu.footer]]
+  name = "RSS"
+  url = "/index.xml"
+  weight = 20
