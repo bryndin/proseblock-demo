@@ -59,9 +59,6 @@ summaryLength = 30
   # Reusable Module Toggles (M-01 to M-17)
   # --------------------------------------------------------------------------
   
-  # Discovery (Search FR-04)
-  enableSearch = true      # Toggles search UI in header
-  
   # Reading Experience (FR-12)
   enableReadingTime = true
   enableTOC = true
@@ -78,10 +75,15 @@ summaryLength = 30
   enableComments = false   # Set to true to load external comment system partial
   enableSharing = true
   enableNewsletter = true
+  enableSearch = true
 
   # --------------------------------------------------------------------------
   # Specific Feature Configurations
   # --------------------------------------------------------------------------
+
+  [params.search]
+    maxResults = 8
+
   [params.newsletter]
     provider = "generic"   # generic, mailchimp, buttondown
     endpoint = "YOUR_ENDPOINT_URL"
