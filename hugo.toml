@@ -12,7 +12,7 @@ summaryLength = 30
 
 # Enable output formats required for Search (FR-04) and RSS (FR-25)
 [outputs]
-  home = ["HTML", "RSS", "JSON"]
+  home = ["HTML", "RSS"]
   section = ["HTML", "RSS"]
   taxonomy = ["HTML", "RSS"]
   term = ["HTML", "RSS"]
@@ -82,7 +82,7 @@ summaryLength = 30
   # --------------------------------------------------------------------------
 
   [params.search]
-    maxResults = 8
+    maxResults = 8         # Default number of search results per page to display
 
   [params.newsletter]
     provider = "generic"   # generic, mailchimp, buttondown
