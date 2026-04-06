@@ -3,8 +3,8 @@ title: 'Admonitions Test Page'
 description: "Testing Hugo's native Markdown alerts (admonitions)."
 summary: "A comprehensive test of the five standard Markdown alerts natively parsed by Hugo: Note, Tip, Important, Warning, and Caution."
 date: 2026-03-13T10:00:00+00:00
-tags: [markdown, admonitions]
-categories: [Design]
+tags: [markdown, admonitions, test]
+categories: [Test]
 draft: false
 ---
 

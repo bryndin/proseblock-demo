@@ -5,9 +5,11 @@ draft = false
 title = 'Building Resilient Web Applications with Modern CSS'
 description = 'A comprehensive guide to using CSS Cascade Layers, Custom Properties, and modern layout techniques to build maintainable, scalable web applications.'
 summary = 'Learn how CSS Cascade Layers, Custom Properties, and modern layout patterns can transform your approach to building and maintaining web applications at scale.'
-categories = ['Design Fundamentals']
-tags = ['css', 'web-development', 'architecture', 'design-systems', 'frontend']
+categories = ['Test', 'Дизайн']
+tags = ['css', 'web-development', 'architecture', 'design-systems', 'frontend', 'веб-разработка', 'test']
 authors = ['Jane Doe']
+weight = 10
+featured = true
 +++
 
 Modern CSS has evolved dramatically in recent years. With features like Cascade Layers, Container Queries, and the `:has()` selector reaching broad browser support, the way we architect stylesheets has fundamentally changed.

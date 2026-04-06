@@ -3,11 +3,12 @@ title: 'Markdown Test Page'
 description: "This is a test page to check Markdown rendering."
 summary: "A comprehensive Markdown rendering test page showcasing various elements like headers, lists, code blocks with syntax highlighting, tables, and nested components. It serves as a visual benchmark for theme styling and Markdown compliance."
 date: 2024-01-01T12:00:00+00:00
-tags: [markdown, post]
-categories: [Design]
-# toc: true
+tags: [markdown, test]
+categories: [Test]
+# enableTOC: false
 # hidden: false
 weight: 12
+featured: true
 draft: false
 ---
 ## Headers

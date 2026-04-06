@@ -1,8 +1,8 @@
 ---
 title: "Code Blocks and Syntax Highlighting"
 date: 2023-02-01T15:23:00+07:00
-tags: [code, softwareengineering, post]
-categories: [Code, Design]
+tags: [code, softwareengineering, post, test]
+categories: [Test, Code]
 # toc: true
 # hidden: false
 weight: 14
