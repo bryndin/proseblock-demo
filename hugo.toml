@@ -73,7 +73,6 @@ summaryLength = 30
 
   # Engagement (FR-24, FR-26, FR-28)
   enableComments = false   # Set to true to load external comment system partial
-  enableSharing = true
   enableNewsletter = true
   enableSearch = true
 
@@ -82,6 +81,11 @@ summaryLength = 30
   # --------------------------------------------------------------------------
   [params.archive]
     groupBy = "year"       # Options: "year", "year-month"
+
+  # --- Featured Carousel Configuration ---
+  [params.featured]
+    autorotate = true
+    interval = 5000 # 5 seconds
 
   [params.widgets]
     categoriesLimit = 10
@@ -149,3 +153,31 @@ summaryLength = 30
     weight = 50
     [menus.main.params]
       icon = "tags"
+
+  [params.share]
+    enable = true
+
+    [[params.share.platforms]]
+    name = "X"
+    icon = "x-twitter"
+    url = "https://twitter.com/intent/tweet?text={title}&url={url}"
+
+    [[params.share.platforms]]
+    name = "Facebook"
+    icon = "facebook"
+    url = "https://www.facebook.com/sharer/sharer.php?u={url}"
+
+    [[params.share.platforms]]
+    name = "LinkedIn"
+    icon = "linkedin"
+    url = "https://www.linkedin.com/sharing/share-offsite/?url={url}"
+
+    [[params.share.platforms]]
+    name = "Reddit"
+    icon = "reddit"
+    url = "https://www.reddit.com/submit?url={url}&title={title}"
+
+    [[params.share.platforms]]
+    name = "Email"
+    icon = "mail"
+    url = "mailto:?subject={title}&body={url}"
