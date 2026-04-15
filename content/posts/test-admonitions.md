@@ -1,5 +1,5 @@
 ---
-title: 'Admonitions Test Page'
+title: "Admonitions Test Page"
 description: "Testing Hugo's native Markdown alerts (admonitions)."
 summary: "A comprehensive test of the five standard Markdown alerts natively parsed by Hugo: Note, Tip, Important, Warning, and Caution."
 date: 2026-03-13T10:00:00+00:00
@@ -8,7 +8,7 @@ categories: [Test]
 draft: false
 ---
 
-This post tests the native Markdown Alerts (Admonitions) supported by Hugo via the GitHub-flavored markdown syntax. 
+This post tests the native Markdown Alerts (Admonitions) supported by Hugo via the GitHub-flavored markdown syntax.
 
 ## Note
 
@@ -61,7 +61,8 @@ This post tests the native Markdown Alerts (Admonitions) supported by Hugo via t
 > This is a **Caution** admonition. Advises about risks or negative outcomes of certain actions.
 
 ## Nested Content in Alerts
-```
+
+````text
 > [!TIP]
 > You can put block elements inside alerts!
 >
@@ -71,13 +72,13 @@ This post tests the native Markdown Alerts (Admonitions) supported by Hugo via t
 > ```js
 > console.log("It even supports full code blocks!");
 > ```
-```
+````
 
 > [!TIP]
 > You can put block elements inside alerts!
 >
-> * It supports standard lists.
-> * It supports inline `code`.
+> - It supports standard lists.
+> - It supports inline `code`.
 >
 > ```js
 > console.log("It even supports full code blocks!");

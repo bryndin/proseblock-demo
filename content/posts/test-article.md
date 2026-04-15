@@ -24,13 +24,19 @@ Consider a typical scenario where a component style is overridden by a utility c
 
 ```css
 /* Component (specificity: 0,1,0) */
-.card { padding: 1rem; }
+.card {
+  padding: 1rem;
+}
 
 /* Utility (specificity: 0,1,0) — wins by source order */
-.p-2 { padding: 0.5rem; }
+.p-2 {
+  padding: 0.5rem;
+}
 
 /* Page hack (specificity: 0,2,0) — beats everything */
-.home .card { padding: 2rem; }
+.home .card {
+  padding: 2rem;
+}
 ```
 
 This approach creates fragile, unpredictable stylesheets that become harder to maintain over time.
@@ -43,7 +49,9 @@ CSS Cascade Layers (`@layer`) solve this problem by giving developers explicit c
 @layer reset, tokens, base, layout, components, utilities;
 
 @layer reset {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     box-sizing: border-box;
     margin: 0;
   }
@@ -81,11 +89,11 @@ Raw values that define the complete design palette. These are the only place whe
 
 Meaningful names mapped to primitives. These create the theming API:
 
-| Token | Light Mode | Dark Mode |
-|-------|-----------|-----------|
-| `--bg-primary` | `--color-off-white` | `--color-gray-950` |
-| `--text-primary` | `--color-gray-900` | `--color-gray-100` |
-| `--accent-main` | `--color-accent-blue` | `--color-accent-blue-light` |
+| Token            | Light Mode            | Dark Mode                   |
+| ---------------- | --------------------- | --------------------------- |
+| `--bg-primary`   | `--color-off-white`   | `--color-gray-950`          |
+| `--text-primary` | `--color-gray-900`    | `--color-gray-100`          |
+| `--accent-main`  | `--color-accent-blue` | `--color-accent-blue-light` |
 
 ### Tier 3: Component Variables
 
@@ -145,4 +153,4 @@ By combining these techniques with disciplined naming conventions (like BEM) and
 
 ---
 
-*This article is part of our series on modern frontend architecture. Stay tuned for the next installment on Container Queries and component-driven responsive design.*
+_This article is part of our series on modern frontend architecture. Stay tuned for the next installment on Container Queries and component-driven responsive design._
