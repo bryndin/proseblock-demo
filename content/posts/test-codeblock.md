@@ -89,6 +89,13 @@ echo "This is a hightlighted line"
 
 As you can see, the code blocks are nicely formatted with syntax highlighting, and the "copy to clipboard" button makes it easy to copy the code.
 
+### Wide Code Block (width test)
+```
+                                                                                                    1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
+          1111111111222222222233333333334444444444555555555566666666667777777777888888888899999999990000000000111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999
+01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+```
+
 ## Conclusion
 
 Maupassant IC makes it easy to share your code with your audience in a clear and readable format. With support for a wide range of programming languages and a convenient "copy to clipboard" button, you can focus on sharing your knowledge and expertise with the world.
