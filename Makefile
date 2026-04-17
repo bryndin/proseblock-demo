@@ -5,9 +5,15 @@
 HUGO_BASEURL := http://localhost:1313
 HUGO_FLAGS   := --gc --minify
 SERVER_PORT  := 1313
-PYTHON       ?= python3
+SYSTEM_PYTHON:= python3
 BASH         ?= bash
 THEME_DIR    := themes/theme-x
+
+# Virtual Environment config
+VENV         := .venv
+VENV_BIN     := $(VENV)/bin
+VENV_PYTHON  := $(VENV_BIN)/python
+VENV_PIP     := $(VENV_BIN)/pip
 
 # ==========================================
 # Colors
@@ -80,11 +86,15 @@ lint-templates: ## Run static analysis Python/Bash scripts on templates
 			$(BASH) "$$script" || fails=1; \
 		fi; \
 	done; \
-	echo "\n$(BLUE)$(BOLD)--- Linting Templates (Python) ---------------------------------------------$(RESET)"; \
+	echo "\n$(BLUE)$(BOLD)--- Linting Templates (Python in VENV) ---------------------------------------$(RESET)"; \
+	if [ ! -d "$(VENV)" ]; then \
+		echo "$(YELLOW)Virtual environment not found. Please run 'make install' first.$(RESET)"; \
+		exit 1; \
+	fi; \
 	for script in tests/*.py; do \
 		if [ -f "$$script" ]; then \
 			echo "$(CYAN)> Executing $(BOLD)$$script$(RESET)$(CYAN)...$(RESET)"; \
-			$(PYTHON) "$$script" || fails=1; \
+			$(VENV_PYTHON) "$$script" || fails=1; \
 		fi; \
 	done; \
 	if [ "$$fails" -ne 0 ]; then \
@@ -93,10 +103,6 @@ lint-templates: ## Run static analysis Python/Bash scripts on templates
 	else \
 		echo "\n$(GREEN)$(BOLD)✅ All template linting scripts passed successfully!$(RESET)"; \
 	fi
-
-.PHONY: format-check
-format-check: ## Check code formatting
-	npx prettier --check "tests/**/*.{ts,js,json}"
 
 # ==========================================
 # TESTS (E2E requiring Build)
@@ -126,6 +132,11 @@ perf: build ## Run Lighthouse performance tests
 ci: clean install lint test ## Full CI Pipeline
 
 .PHONY: install
-install: ## Install dependencies (npm & playwright)
+install: ## Install dependencies (npm, playwright, & python venv)
 	npm install
 	npx playwright install --with-deps
+	@echo "$(BLUE)$(BOLD)--- Setting up Python Virtual Environment ---$(RESET)"
+	$(SYSTEM_PYTHON) -m venv $(VENV)
+	$(VENV_PIP) install --upgrade pip
+	$(VENV_PIP) install -r tests/requirements.txt
+	@echo "$(GREEN)$(BOLD)✅ Dependencies installed successfully!$(RESET)"

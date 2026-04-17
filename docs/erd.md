@@ -146,7 +146,38 @@ Example:
 
 ---
 
-### 1.4 Syntax Highlighting
+### 1.4 Strict Naming Conventions
+
+To guarantee our 3-Tier Token API is parsable and predictable, all variables must adhere to strict prefixing rules based on their Tier.
+
+- **Tier 1: Primitives (Physical properties)**
+  - **Format:** `--[category]-[scale/name]`
+  - **Allowed prefixes:** `--color-*`, `--space-*`, `--font-*`, `--size-*`, `--radius-*`, `--shadow-*`, `--time-*`
+  - _Example:_ `--color-blue-500`, `--space-4`, `--font-sans`
+
+- **Tier 2.1: Global Semantics (UI Intent)**
+  - **Format:** `--[intent]-[variant]`
+  - **Allowed prefixes:** `--bg-*`, `--text-*`, `--border-*`, `--link-*`, `--icon-*`
+  - _Example:_ `--bg-primary`, `--text-muted`, `--border-focus`
+
+- **Tier 2.2: Component Semantics (Component Hook)**
+  - **Format:** `--[component]-[intent]`
+  - **Allowed prefixes:** Must start with the exact component name (without the `.c-` class prefix).
+  - _Example:_ `--header-bg`, `--article-card-border`
+
+- **Tier 3: Private Component Variables**
+  - **Format:** `--_[property]`
+  - **Allowed prefixes:** Must start with an underscore `--_`.
+  - _Example:_ `--_bg`, `--_padding`, `--_gap`
+
+- **State & Logic Hooks**
+  - **Format:** `.is-[state]`, `.has-[state]`, `.js-[hook]`
+  - **Rule:** Use these exclusively for toggling state via Hugo templates or JavaScript. Do not bind structural CSS directly to `.js-` classes. 
+  - _Example:_ `.is-active`, `.has-dropdown`, `.js-slider`
+
+---
+
+### 1.5 Syntax Highlighting
 
 The theme strictly avoids custom CSS syntax mapping. It utilizes `hugo gen chromastyles` to dump native Light and Dark themes. The Dark theme output is manually nested inside a `[data-theme="dark"]` selector to ensure seamless toggling.
 

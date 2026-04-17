@@ -1,9 +1,11 @@
 {
-  "extends": ["stylelint-config-standard"],
   "rules": {
-    "no-duplicate-selectors": true,
-    "no-descending-specificity": null,
-    "selector-class-pattern": null,
-    "custom-property-pattern": null
+    "selector-class-pattern": [
+      "^(?:[clu]-(?:[a-z0-9]+(?:-[a-z0-9]+)*)(?:__[a-z0-9]+(?:-[a-z0-9]+)*)?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?|(?:is|has|js)-[a-z0-9-]+)$",
+      {
+        "resolveNestedSelectors": true,
+        "message": "Class names must follow BEM (.c-, .l-, .u-) or be state/JS hooks (.is-, .has-, .js-) (e.g., .c-card__title, .is-active)"
+      }
+    ]
   }
 }
