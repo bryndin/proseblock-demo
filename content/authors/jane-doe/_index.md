@@ -2,7 +2,7 @@
 title: "Jane Doe"
 # Path to the image relative to the 'static' directory
 avatar: "/images/authors/jane-doe.png"
-social:
+socials:
   - name: "X"
     icon: "x-twitter"
     url: "https://x.com/janedoe"
