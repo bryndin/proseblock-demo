@@ -3,7 +3,12 @@
 .vscode/
 .idea/
 
+.venv/
+
 public/
+
+# Design images and prototypes
+design/
 
 # Playwright
 node_modules/
