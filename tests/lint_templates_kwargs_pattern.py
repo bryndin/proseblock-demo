@@ -45,7 +45,7 @@ def test_kwargs_pattern():
 
                 print(f"❌ {filepath.relative_to(layouts_dir.parent.parent)}:{line_num}")
                 print(f"   Violation: Direct property extraction '{prop_match.group(0).strip()}'.")
-                print(f"   Refactor to: '$kwargs := .' followed by '{var_name} := $kwargs.{prop_name}'")
+                print("   Refactor to: '$kwargs := .' followed by '{var_name} := $kwargs.{prop_name}'")
                 issues += 1
 
             # Check 2: Bad Dictionary Variables
@@ -56,7 +56,7 @@ def test_kwargs_pattern():
 
                     print(f"❌ {filepath.relative_to(layouts_dir.parent.parent)}:{line_num}")
                     print(f"   Violation: Non-standard dict context name '${var_name} := .'")
-                    print(f"   Refactor to: '$kwargs := .' when receiving a dictionary of arguments.")
+                    print("   Refactor to: '$kwargs := .' when receiving a dictionary of arguments.")
                     issues += 1
 
     if issues == 0:

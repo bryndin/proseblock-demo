@@ -67,7 +67,7 @@ serve: build ## Serve the built site locally
 # ==========================================
 
 .PHONY: lint
-lint: lint-js lint-css lint-templates ## Run all linters (JS, CSS, Templates)
+lint: lint-js lint-css lint-templates lint-python ## Run all linters (JS, CSS, Templates, Python)
 
 .PHONY: lint-js
 lint-js: ## Lint custom JS (excluding vendor)
@@ -76,6 +76,10 @@ lint-js: ## Lint custom JS (excluding vendor)
 .PHONY: lint-css
 lint-css:
 	npx stylelint "$(THEME_DIR)/assets/css/**/*.css"
+
+.PHONY: lint-python
+lint-python: ## Lint Python test and script files using Ruff
+	$(VENV_PYTHON) -m ruff check tests
 
 .PHONY: lint-templates
 lint-templates: ## Run static analysis Python/Bash scripts on templates
