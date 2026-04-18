@@ -2,9 +2,10 @@
 # Config
 # ==========================================
 
-HUGO_BASEURL := http://localhost:1313
+SERVER_PORT  := 1315
+TEST_SERVE   := tcp://localhost:$(SERVER_PORT)
+HUGO_BASEURL := http://localhost:$(SERVER_PORT)
 HUGO_FLAGS   := --gc --minify
-SERVER_PORT  := 1313
 SYSTEM_PYTHON:= python3
 BASH         ?= bash
 THEME_DIR    := themes/theme-x
@@ -69,8 +70,8 @@ serve: build ## Serve the built site locally
 lint: lint-js lint-css lint-templates ## Run all linters (JS, CSS, Templates)
 
 .PHONY: lint-js
-lint-js:
-	npx eslint tests --max-warnings=0
+lint-js: ## Lint custom JS (excluding vendor)
+	npx eslint "themes/theme-x/assets/js/**/*.js" --ignore-pattern "**/vendor/**" --max-warnings=0
 
 .PHONY: lint-css
 lint-css:
@@ -110,15 +111,15 @@ lint-templates: ## Run static analysis Python/Bash scripts on templates
 
 .PHONY: test
 test: build ## Run all Playwright E2E tests
-	npx playwright test
+	npx start-server-and-test 'npx serve public -l $(TEST_SERVE) > /dev/null' $(HUGO_BASEURL) 'npx playwright test'
 
 .PHONY: test-fast
 test-fast: build ## Run fast structure E2E tests
-	npx playwright test --grep @structure --workers=4
+	npx start-server-and-test 'npx serve public -l $(TEST_SERVE) > /dev/null' $(HUGO_BASEURL) 'npx playwright test --grep @structure --workers=4'
 
 .PHONY: test-visual
 test-visual: build ## Run visual regression tests
-	npx playwright test --grep @visual --workers=2
+	npx start-server-and-test 'npx serve public -l $(TEST_SERVE) > /dev/null' $(HUGO_BASEURL) 'npx playwright test --grep @visual --workers=2'
 
 # ==========================================
 # PERF & CI & BOOTSTRAP
