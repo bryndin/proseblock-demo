@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import globals from 'globals';
 
 export default [
   {
@@ -6,6 +7,9 @@ export default [
   },
   js.configs.recommended,
   {
-    files: ['tests/**/*.ts', 'tests/**/*.js'],
+    files: ['themes/**/*.js', 'tests/**/*.ts', 'tests/**/*.js'],
+    languageOptions: {
+      globals: globals.browser,
+    },
   },
 ];
