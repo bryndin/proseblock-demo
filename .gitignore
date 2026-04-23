@@ -13,6 +13,7 @@ design/
 # Playwright
 node_modules/
 /test-results/
+/tests/_visual-output/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
