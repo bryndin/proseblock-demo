@@ -31,7 +31,7 @@ The CSS orchestrator (`layouts/_partials/head/css.html`) defines the layer order
 
 ### 1.3 CSS Cascade Layers (`@layer`)
 
-All CSS is explicitly scoped into ordered layers to eliminate specificity conflicts. Later layers explicitly override earlier ones, regardless of selector weight.
+All CSS is scoped into an ordered layer hierarchy to eliminate specificity conflicts. Later layers explicitly override earlier ones, regardless of selector weight.
 
 1. `reset`: Minimal resets (box-sizing, margin clearing).
 2. `tokens`: CSS Custom Properties (Variables) registry.
@@ -40,7 +40,7 @@ All CSS is explicitly scoped into ordered layers to eliminate specificity confli
 5. `components`: Encapsulated UI elements (widgets, cards).
 6. `utilities`: Immutable helper classes (`.u-sr-only`, `.u-mt-4`).
 
-Layers are defined in `layouts/_partials/head/css.html`.
+**Implementation Rule:** To ensure absolute, centralized control over the cascade, individual CSS files **must not** contain `@layer` wrappers. Instead, layer assignment is orchestrated dynamically during the Hugo asset pipeline via `layouts/_partials/head/css.html`.
 
 ### 1.4 JavaScript Architecture
 
@@ -69,7 +69,7 @@ Raw values strictly defined inside the `:root` selector.
 Abstract names representing design intent. This tier is split into two sub-levels:
 
 * **Tier 2.1: Global Semantics:** Broad abstractions (e.g., `--text-primary`). Must map directly to *Tier 1 Primitives*. **Only variables in this tier should be reassigned inside the `[data-theme="dark"]` selector.**
-* **Tier 2.2: Component Semantics:** Component-specific hooks (e.g., `--header-bg`, `--metadata-color`) that alias *Tier 2.1* variables. They automatically inherit dark mode flips.
+* **Tier 2.2: Component Semantics:** Component-specific hooks (e.g., `--header-bg`, `--metadata-text`) that alias *Tier 2.1* variables. They automatically inherit dark mode flips.
 
 ### 2.3 Tier 3: Private Component Variables (`--_name`)
 
@@ -79,7 +79,7 @@ Defined strictly inside specific component selectors (e.g., `.c-header`) to ensu
 * **Provides:** (`@provides` tagged) Reassign Tier 2.2 variables to push contextual styles down to nested child components. This loosely couples parents to children without breaking BEM encapsulation.
 * **Configuration:** (`@internal` tagged) Hardcoded structural values or Tier 1 references (e.g., `--_padding: var(--space-4);`). Magic numbers must be quarantined here and never written inline in the CSS body.
 
-**Example: Component Overriding (Hero overriding Metadata child)**
+Example: Component Overriding (Hero overriding Metadata child)
 
 ```css
 /* ==============================================
@@ -91,7 +91,7 @@ Defined strictly inside specific component selectors (e.g., `.c-header`) to ensu
   --text-secondary: var(--color-gray-500);
 
   /* Tier 2.2 Defaults */
-  --metadata-color: var(--text-secondary);
+  --metadata-text: var(--text-secondary);
   --hero-text: var(--text-primary);
 }
 
@@ -100,7 +100,7 @@ Defined strictly inside specific component selectors (e.g., `.c-header`) to ensu
    ============================================== */
 .c-metadata {
   /* @api: Ingested Semantics */
-  --_color: var(--metadata-color);
+  --_color: var(--metadata-text);
 
   color: var(--_color); /* Applies to text, SVG currentcolor, and separators */
 }
@@ -116,7 +116,7 @@ Defined strictly inside specific component selectors (e.g., `.c-header`) to ensu
   /* @provides: Contextual Overrides
      Forces any .c-metadata nested inside this hero
      to inherit the hero's text color. */
-  --metadata-color: var(--_text);
+  --metadata-text: var(--_text);
 
   /* @internal: Geometry & Layout */
   --_padding-y: var(--space-8);
@@ -127,12 +127,13 @@ Defined strictly inside specific component selectors (e.g., `.c-header`) to ensu
 }
 ```
 
-### 2.4 Muting Secondary Elements (Color Alpha)
+### 2.4 Muting Elements (Relative Color Syntax)
 
-To establish typographic hierarchy (e.g., muting subtitles, metadata, captions), developers MUST use **Color Alpha** (semi-transparent colors) rather than CSS `opacity` or solid grayscale colors.
+To establish typographic hierarchy (e.g., muting subtitles, metadata, borders), developers MUST use **CSS Relative Color Syntax** to apply alpha (transparency) dynamically.
 
-* **Implementation:** Apply the alpha channel natively using the standard OKLCH format (e.g., `color: oklch(var(--text-primary-lch) / 0.6);`) or via designated Tier 2 semantic tokens (e.g., `--text-muted`).
-* **Rationale:** Color alpha adapts dynamically, harmonizing with underlying background shifts across light and dark themes. It strictly isolates the muting effect to the text element, explicitly avoiding the side-effects of CSS `opacity` (which inescapably mutes vivid child elements and triggers unwanted stacking contexts).
+* **Implementation:** Use the `from` keyword combined with OKLCH syntax and Tier 1 Opacity primitives:
+  `color: oklch(from var(--text-primary) l c h / var(--opacity-medium));`
+* **Rationale:** Relative color syntax eliminates the need to pollute Tier 1 with decomposed color channels. It harmonizes seamlessly with underlying background shifts across light and dark themes, and strictly isolates the muting effect to the target element (avoiding the cascading side-effects of CSS `opacity`).
 * **Constraint:** Alpha-muted text MUST maintain a minimum WCAG 2.2 AA **4.5:1 contrast ratio** against the background layer.
 
 ---
