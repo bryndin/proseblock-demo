@@ -13,7 +13,7 @@ draft: false
 ---
 ## Headers
 
-```
+```text
 # h1 Heading 8-)
 ## h2 Heading
 ### h3 Heading
@@ -28,7 +28,7 @@ Alt-H1
 
 Alt-H2
 ------
-```	
+```
 
 # h1 Heading 8-)
 ## h2 Heading
@@ -49,7 +49,7 @@ Alt-H2
 
 ## Emphasis
 
-```
+```text
 Emphasis, aka italics, with *asterisks* or _underscores_.
 
 Strong emphasis, aka bold, with **asterisks** or __underscores__.
@@ -91,7 +91,7 @@ _This is italic text_
 
 ## Lists
 
-```
+```text
 1. First ordered list item
 2. Another item
 ⋅⋅⋅* Unordered sub-list.
@@ -167,7 +167,7 @@ _This is italic text_
 
 ## Task lists
 
-```
+```text
 - [x] Finish my changes
 - [ ] Push my commits to GitHub
 - [ ] Open a pull request
@@ -191,7 +191,7 @@ _This is italic text_
 
 You can ignore (or escape) Markdown formatting by using \ before the Markdown character.
 
-```
+```text
 Let's rename \*our-new-project\* to \*our-old-project\*.
 ```
 
@@ -201,7 +201,7 @@ Let's rename \*our-new-project\* to \*our-old-project\*.
 
 ## Links
 
-```
+```text
 [I'm an inline-style link](https://www.google.com)
 
 [I'm an inline-style link with title](https://www.google.com "Google's Homepage")
@@ -251,7 +251,7 @@ Some text to show that the reference links can follow later.
 
 ## Images
 
-```
+```text
 Here's our logo (hover to see the title text):
 
 Inline-style:
@@ -299,7 +299,7 @@ With a reference later in the document defining the URL location:
 
 ## [Footnotes](https://github.com/markdown-it/markdown-it-footnote)
 
-```
+```text
 Footnote 1 link[^first].
 
 Footnote 2 link[^second].
@@ -333,7 +333,7 @@ Duplicated footnote reference[^second].
 
 ## Code and Syntax Highlighting
 
-```
+```text
 Inline `code` has `back-ticks around` it.
 ```
 
@@ -457,7 +457,7 @@ datahere
 
 ## Tables
 
-```
+```text
 Colons can be used to align columns.
 
 | Tables        | Are           | Cool  |
@@ -563,7 +563,7 @@ Wide tables get a scroll bar.
 
 ## Blockquotes
 
-```
+```text
 > Blockquotes are very handy in email to emulate reply text.
 > This line is part of the same quote.
 
@@ -591,7 +591,7 @@ Quote break.
 
 ## Inline HTML
 
-```
+```text
 <dl>
   <dt>Definition list</dt>
   <dd>Is something people use sometimes.</dd>
@@ -614,7 +614,7 @@ The Hugo framework supports inline HTML in Markdown content, but it is disabled 
 
 ## Horizontal Rules
 
-```
+```text
 Three or more...
 
 ---
@@ -648,7 +648,7 @@ Underscores
 
 ## YouTube Videos
 
-```
+```text
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=YOUTUBE_VIDEO_ID_HERE" target="_blank">
 <img src="http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg" alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10">
 </a>
@@ -658,7 +658,7 @@ Underscores
 <img src="http://img.youtube.com/vi/0RKpf3rK57I/0.jpg" alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10">
 </a>
 
-```
+```text
 [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg)](http://www.youtube.com/watch?v=YOUTUBE_VIDEO_ID_HERE)
 ```
 
