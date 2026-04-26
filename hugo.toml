@@ -46,7 +46,7 @@ summaryLength = 30
 # THEME PARAMETERS / MODULE TOGGLES (FR-34 & FR-35)
 # ==============================================================================
 [params]
-  description = " A modern, content-first Hugo theme for editorial, technical, and article-driven websites. Focused on the structural principles of longevity."
+  description = "Exploring the intersection of digital minimalism, typography, and technical craft. A haven for long-form reading, designed to give words the space they deserve."
   
   # Identity & Trust (FR-21)
   dateFormat = "Jan 2, 2006"
