@@ -7,7 +7,7 @@
       "^(?:[clu]-(?:[a-z0-9]+(?:-[a-z0-9]+)*)(?:__[a-z0-9]+(?:-[a-z0-9]+)*)?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?|(?:is|has|js)-[a-z0-9-]+)$",
       {
         "resolveNestedSelectors": true,
-        "message": "Class names must follow BEM (.c-, .l-, .u-) or be state/JS hooks (.is-, .has-, .js-) (e.g., .c-card__title, .is-active)"
+        "message": "Class names must follow BEM (.c-, .l-, .u-) or be state/JS hooks (.is-, .has-, .js-)"
       }
     ]
   }
