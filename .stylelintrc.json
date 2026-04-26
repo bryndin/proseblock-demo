@@ -1,6 +1,6 @@
 {
   "ignoreFiles":[
-    "themes/theme-x/assets/css/syntax-highlighting/**/*.css"
+    "themes/proseblock/assets/css/syntax-highlighting/**/*.css"
   ],
   "rules": {
     "selector-class-pattern": [

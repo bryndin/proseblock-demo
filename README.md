@@ -1,6 +1,6 @@
 ## Setting up Core Pages (Search, Archives, Authors)
 
-Theme X uses Hugo's native routing to generate custom functional pages. Because a theme should never force content onto your site, you must opt-in to these pages by creating a simple `_index.md` file in your site's `content` folder.
+ProseBlock uses Hugo's native routing to generate custom functional pages. Because a theme should never force content onto your site, you must opt-in to these pages by creating a simple `_index.md` file in your site's `content` folder.
 
 ### 1. Enable the Search Page
 

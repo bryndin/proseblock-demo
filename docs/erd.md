@@ -1,9 +1,9 @@
 ---
 date: "2026-04-16T14:50:00-07:00"
-title: "ERD: Theme X"
-description: "Engineering Requirements Document (ERD): Project 'Theme X'"
+title: "ERD: ProseBlock"
+description: "Engineering Requirements Document (ERD): Project 'ProseBlock'"
 summary: |
-  Engineering Requirements Document (ERD): Project "Theme X".
+  Engineering Requirements Document (ERD): Project "ProseBlock".
   **Version:** 1.1
   **Date:** April 2026
 ---
@@ -17,7 +17,7 @@ summary: |
 
 ### 1.1 Core Methodology
 
-Theme X utilizes Vanilla CSS and Vanilla JavaScript. It achieves modularity, maintainability, and flat specificity by combining **CSS Cascade Layers**, strict **BEM naming**, and a **3-Tier CSS Custom Property (Variable) system**. The templating system enforces explicit local variables to eliminate Go-template scope bleeding.
+ProseBlock utilizes Vanilla CSS and Vanilla JavaScript. It achieves modularity, maintainability, and flat specificity by combining **CSS Cascade Layers**, strict **BEM naming**, and a **3-Tier CSS Custom Property (Variable) system**. The templating system enforces explicit local variables to eliminate Go-template scope bleeding.
 
 ### 1.2 CSS Bundling (Hugo Pipes)
 
@@ -198,7 +198,7 @@ All references to global configuration (`site.Params`) or page front-matter (`$p
 
 ## 4. Markdown & Render Hooks
 
-Theme X heavily relies on Hugo Render Hooks (`layouts/_markup/`) to upgrade standard Markdown into rich UI components without proprietary shortcodes.
+ProseBlock heavily relies on Hugo Render Hooks (`layouts/_markup/`) to upgrade standard Markdown into rich UI components without proprietary shortcodes.
 
 * **Code Blocks:** `render-codeblock.html` intercepts backticks, applying Chroma syntax highlighting inside a custom UI shell featuring a native copy-to-clipboard button.
 * **Automated Syntax Theming:** Syntax highlighting CSS is generated via `hugo gen chromastyles`. **Manual editing is forbidden.** The dark theme payload must be wrapped via a deterministic build script (`npm run build:syntax`) that outputs a `.c-chroma-dark` layer file to prevent drift.

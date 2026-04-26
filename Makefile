@@ -8,7 +8,7 @@ HUGO_BASEURL := http://localhost:$(SERVER_PORT)
 HUGO_FLAGS   := --gc --minify
 SYSTEM_PYTHON:= python3
 BASH         ?= bash
-THEME_DIR    := themes/theme-x
+THEME_DIR    := themes/proseblock
 TESTS_DIR    := tests
 TOOLS_DIR    := $(TESTS_DIR)/tools
 

@@ -1,7 +1,7 @@
 {
-  "name": "theme-x-demo",
+  "name": "proseblock",
   "version": "1.0.0",
-  "description": "Theme X uses Hugo's native routing to generate custom functional pages. Because a theme should never force content onto your site, you must opt-in to these pages by creating a simple `_index.md` file in your site's `content` folder.",
+  "description": "ProseBlock uses Hugo's native routing to generate custom functional pages. Because a theme should never force content onto your site, you must opt-in to these pages by creating a simple `_index.md` file in your site's `content` folder.",
   "main": "index.js",
   "scripts": {
     "test:e2e": "start-server-and-test 'npx serve public -l tcp://127.0.0.1:1315' http://127.0.0.1:1315 'npx playwright test --grep @structure'"

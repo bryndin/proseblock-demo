@@ -2,9 +2,9 @@
 # BASE CONFIGURATION
 # ==============================================================================
 baseURL = "https://example.com/"
-title = "Theme X"
+title = "ProseBlock"
 languageCode = "en-us"
-theme = "theme-x"
+theme = "proseblock"
 summaryLength = 30
 
 [pagination]

@@ -178,8 +178,8 @@ def lint_component_file(filepath: str) -> list[str]:
 
 def main():
     all_errors = []
-    # Resolves to: ../themes/theme-x/assets/css/components
-    components_dir = Path(__file__).parent.parent / "themes" / "theme-x" / "assets" / "css" / "components"
+    # Resolves to: ../themes/proseblock/assets/css/components
+    components_dir = Path(__file__).parent.parent / "themes" / "proseblock" / "assets" / "css" / "components"
 
     if not components_dir.exists():
         print(f"{RED}Error: Directory not found: {components_dir}{RESET}")

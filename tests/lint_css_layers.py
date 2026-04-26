@@ -8,7 +8,7 @@ RED = '\033[31m'
 GREEN = '\033[32m'
 RESET = '\033[0m'
 
-file_path = 'themes/theme-x/layouts/_partials/head/css.html'
+file_path = 'themes/proseblock/layouts/_partials/head/css.html'
 
 if not os.path.exists(file_path):
     print(f"{RED}Error: File {file_path} not found.{RESET}")

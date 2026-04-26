@@ -13,8 +13,8 @@ BOLD = '\033[1m'
 RESET = '\033[0m'
 
 # Configuration
-TOKENS_FILE = 'themes/theme-x/assets/css/tokens.css'
-CSS_DIR = 'themes/theme-x/assets/css'
+TOKENS_FILE = 'themes/proseblock/assets/css/tokens.css'
+CSS_DIR = 'themes/proseblock/assets/css'
 
 # Hardcoded allowlist for token scales that we expect to be unused but need for API completeness.
 # Since your architecture defines full primitives scales (Tier 1), we safely ignore them here.

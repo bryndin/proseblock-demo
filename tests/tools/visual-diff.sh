@@ -56,7 +56,7 @@ done
 git -c protocol.file.allow=always submodule sync --recursive
 # git -c protocol.file.allow=always submodule update --init --recursive --checkout
 # Refernce the local copy instead of the remote
-git -c protocol.file.allow=always submodule update --init --recursive --reference "$ORIG_DIR/themes/theme-x"
+git -c protocol.file.allow=always submodule update --init --recursive --reference "$ORIG_DIR/themes/proseblock"
 run make build VERBOSE="$VERBOSE" --no-print-directory
 
 VISUAL_BASELINE=before run timeout 30s npx start-server-and-test \

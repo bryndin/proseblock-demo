@@ -20,7 +20,7 @@ def preserve_newlines(match):
     return '\n' * match.group(0).count('\n')
 
 def test_explicit_params():
-    layouts_dir = Path(__file__).parent.parent / "themes" / "theme-x" / "layouts"
+    layouts_dir = Path(__file__).parent.parent / "themes" / "proseblock" / "layouts"
     
     if not layouts_dir.exists():
         print(f"Directory not found: {layouts_dir}")

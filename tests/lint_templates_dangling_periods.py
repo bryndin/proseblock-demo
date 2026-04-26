@@ -26,9 +26,9 @@ def preserve_newlines(match):
     return '\n' * match.group(0).count('\n')
 
 def test_zero_dot_policy():
-    # Resolves to: ../themes/theme-x/layouts
-    # Adjust "theme-x" to match your actual theme folder name
-    layouts_dir = Path(__file__).parent.parent / "themes" / "theme-x" / "layouts"
+    # Resolves to: ../themes/proseblock/layouts
+    # Adjust "proseblock" to match your actual theme folder name
+    layouts_dir = Path(__file__).parent.parent / "themes" / "proseblock" / "layouts"
 
     if not layouts_dir.exists():
         print(f"Directory not found: {layouts_dir}")

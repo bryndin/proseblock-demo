@@ -101,14 +101,14 @@ def lint_components(filepath):
 all_errors =[]
 
 # 1. Lint Tokens
-tokens_file = 'themes/theme-x/assets/css/tokens.css'
+tokens_file = 'themes/proseblock/assets/css/tokens.css'
 if os.path.exists(tokens_file):
     all_errors.extend(lint_tokens_file(tokens_file))
 else:
     print(f"{YELLOW}Warning: {tokens_file} not found. Skipping tokens linting.{RESET}")
 
 # 2. Lint Components
-component_files = glob.glob('themes/theme-x/assets/css/components/**/*.css', recursive=True)
+component_files = glob.glob('themes/proseblock/assets/css/components/**/*.css', recursive=True)
 for comp_file in component_files:
     all_errors.extend(lint_components(comp_file))
 
