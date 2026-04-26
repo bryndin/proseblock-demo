@@ -4,7 +4,7 @@ import path from 'path';
 
 const BASELINE = process.env.VISUAL_BASELINE || 'after';
 const RAW_URL = process.env.VISUAL_URL || '/';
-const OUT_DIR = process.env.VISUAL_OUT_DIR || 'tests/visual-output';
+const OUT_DIR = process.env.VISUAL_OUT_DIR || 'tests/_visual-output';
 
 function resolveUrl(raw: string): string {
     if (raw.startsWith('http://') || raw.startsWith('https://')) {

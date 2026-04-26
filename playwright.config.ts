@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const port = 1315;
+const baseURL = `http://localhost:${port}`;
+
 export default defineConfig({
   testDir: './tests/e2e',
   /* Run tests in files in parallel */
@@ -13,8 +16,9 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. */
+
   use: {
-    baseURL: 'http://127.0.0.1:1315',
+    baseURL,
     trace: 'on-first-retry',
   },
 
@@ -28,15 +32,13 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    // Bind serve to all interfaces using 0.0.0.0
-    command: 'npx --yes serve public -l tcp://0.0.0.0:1315',
-    // Tell Playwright to check 0.0.0.0
-    url: 'http://0.0.0.0:1315',
-    reuseExistingServer: !process.env.CI,
-    stdout: 'ignore',
-    stderr: 'pipe',
-    timeout: 5000
-  },
+  /* It's broken on WSL, see my https://github.com/microsoft/playwright/issues/40430 */
+  // webServer: {
+  //   command: `npx serve public -l ${port} --no-clipboard`,
+  //   url: baseURL,
+  //   reuseExistingServer: !process.env.CI,
+  //   stdout: process.env.VERBOSE === '1' ? 'pipe' : 'ignore',
+  //   stderr: process.env.VERBOSE === '1' ? 'pipe' : 'ignore',
+  // },
 });
 
