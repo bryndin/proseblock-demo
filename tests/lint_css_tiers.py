@@ -6,13 +6,16 @@ Validates CSS custom properties follow the strict ERD-defined architecture.
 Tier Detection Strategy (Solution C - Section-Based):
 - tokens.css: Parses /* === TIER X.X: ... */ comments to map line ranges to tiers.
   This is robust against naming changes and requires no prefix conventions.
-- Component files: Only validates Tier 3 encapsulation (--_ prefix).
+- Component files: Validates Tier 3 encapsulation with special @provides handling.
 
 Enforces reference rules:
 - Tier 2.1 may only reference Tier 1
 - Tier 2.2 may only reference Tier 2.1
 - Only Tier 2.1 can be redefined in [data-theme="dark"]
-- Component variables must use --_ prefix for encapsulation
+
+Component Validation:
+- Variables outside @provides sections: Must use --_ prefix (Tier 3, private)
+- Variables inside @provides sections: May be Tier 2.2 (reassigning global semantics)
 """
 import glob
 import os
@@ -26,8 +29,75 @@ GREEN = '\033[32m'
 YELLOW = '\033[33m'
 RESET = '\033[0m'
 
-# Section marker regex: matches "/* === TIER X.X: ... */" or "/* === TIER X: ... */"
-TIER_SECTION_RE = re.compile(r'/\*\s*=+\s*TIER\s+(\d+(?:\.\d+)?):', re.IGNORECASE)
+# Section marker regex: matches "TIER X.X:" or "TIER X:" anywhere in a comment line
+TIER_SECTION_RE = re.compile(r'TIER\s+(\d+(?:\.\d+)?):', re.IGNORECASE)
+
+# @provides section marker: matches "@provides" anywhere in a comment
+PROVIDES_RE = re.compile(r'@provides', re.IGNORECASE)
+
+
+def build_provides_map(filepath):
+    """
+    Pre-scans component CSS files to detect @provides section ranges.
+    Returns a list of (start_line, end_line) tuples marking @provides sections.
+
+    A @provides section starts at a comment containing @provides and ends
+    at the next comment starting with @api, @internal, @provides, or the
+    end of the rule block.
+    """
+    sections = []
+    in_provides = False
+    provides_start = None
+
+    with open(filepath, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    for line_num, line in enumerate(lines, start=1):
+        # Check if this line contains a section marker
+        if re.search(r'@\s*(api|internal|provides)', line, re.IGNORECASE):
+            if in_provides and provides_start is not None:
+                # End the current @provides section
+                sections.append((provides_start, line_num - 1))
+                in_provides = False
+                provides_start = None
+
+            # Check if starting a new @provides section
+            if PROVIDES_RE.search(line):
+                in_provides = True
+                provides_start = line_num
+
+    # If @provides continues to end of file
+    if in_provides and provides_start is not None:
+        sections.append((provides_start, len(lines) + 1000))
+
+    return sections
+
+
+# Prefix-based tier detection for component validation
+TIER1_PREFIXES = ('--color-', '--space-', '--font-', '--size-', '--radius-', '--shadow-raw-', '--time-', '--weight-', '--tracking-', '--leading-', '--z-', '--opacity-', '--duration-', '--ease-', '--scale-', '--motion-', '--border-width-', '--blur-')
+TIER2_1_PREFIXES = ('--bg-', '--text-', '--border-', '--link-', '--icon-', '--accent', '--intent-', '--shadow-', '--z-', '--transition-', '--filter')
+
+
+def get_tier_by_prefix(var_name):
+    """
+    Classify variable tier by prefix for component validation.
+    Used to validate @provides section restrictions.
+    """
+    if var_name.startswith('--_'):
+        return 3
+    if var_name.startswith(TIER1_PREFIXES):
+        return 1
+    if var_name == '--accent' or var_name.startswith(TIER2_1_PREFIXES):
+        return 2.1
+    return 2.2
+
+
+def is_in_provides(line_num, provides_map):
+    """Check if a given line number falls within a @provides section."""
+    for start, end in provides_map:
+        if start <= line_num <= end:
+            return True
+    return False
 
 
 def build_tier_section_map(filepath):
@@ -149,13 +219,13 @@ def lint_tokens_file(filepath):
                 if tier == 2.1:
                     # Tier 2.1 MUST ONLY reference Tier 1
                     for ref in refs:
-                        ref_tier = get_tier(ref, line_num=None, tier_map=tier_map)
+                        ref_tier = var_tier_map.get(ref)
                         if ref_tier != 1:
                             errors.append(f"{filepath}:{line_num} | '{decl.name}' (Tier 2.1) illegally references '{ref}' (Tier {ref_tier}). It must only reference Tier 1 primitives.")
                 elif tier == 2.2:
                     # Tier 2.2 MUST ONLY reference Tier 2.1
                     for ref in refs:
-                        ref_tier = var_tier_map.get(ref) or get_tier(ref, line_num=None, tier_map=tier_map)
+                        ref_tier = var_tier_map.get(ref)
                         if ref_tier != 2.1:
                             errors.append(f"{filepath}:{line_num} | '{decl.name}' (Tier 2.2) illegally references '{ref}' (Tier {ref_tier}). It must only reference Tier 2.1 global semantics.")
 
@@ -168,8 +238,20 @@ def lint_tokens_file(filepath):
     return errors
 
 def lint_components(filepath):
-    """Validates that components perfectly encapsulate variables (Tier 3)."""
-    errors =[]
+    """
+    Validates component CSS variable encapsulation.
+
+    Rules:
+    - Variables in @provides sections: Can only be Tier 2.2 (reassigning global
+      component semantics for child components). Tier 1 and Tier 2.1 cannot
+      be reassigned in components.
+    - Variables elsewhere: Must be Tier 3 (start with '--_') - private to this component.
+    """
+    errors = []
+
+    # Pre-scan for @provides sections
+    provides_map = build_provides_map(filepath)
+
     with open(filepath, 'r', encoding='utf-8') as f:
         rules = tinycss2.parse_stylesheet(f.read(), skip_comments=True, skip_whitespace=True)
 
@@ -179,8 +261,24 @@ def lint_components(filepath):
                 decls = tinycss2.parse_declaration_list(rule.content, skip_comments=True, skip_whitespace=True)
                 for decl in decls:
                     if decl.type == 'declaration' and decl.name.startswith('--'):
-                        if not decl.name.startswith('--_'):
-                            errors.append(f"{filepath}:{decl.source_line} | Component variable '{decl.name}' must be private (Tier 3) and start with '--_'.")
+                        line_num = decl.source_line
+                        var_name = decl.name
+                        is_private = var_name.startswith('--_')
+                        in_provides = is_in_provides(line_num, provides_map)
+
+                        if in_provides:
+                            # @provides section: only Tier 2.2 variables allowed
+                            tier = get_tier_by_prefix(var_name)
+                            if tier == 1:
+                                errors.append(f"{filepath}:{line_num} | Cannot reassign '{var_name}' (Tier 1 Primitive) in component. Only Tier 2.2 variables can be overridden in @provides.")
+                            elif tier == 2.1:
+                                errors.append(f"{filepath}:{line_num} | Cannot reassign '{var_name}' (Tier 2.1 Global Semantic) in component. Only Tier 2.2 variables can be overridden in @provides.")
+                            elif tier == 3:
+                                errors.append(f"{filepath}:{line_num} | Private variable '{var_name}' (Tier 3) should not be in @provides. Move to @api or @internal section.")
+                        else:
+                            # Outside @provides: must be private (Tier 3)
+                            if not is_private:
+                                errors.append(f"{filepath}:{line_num} | Component variable '{var_name}' must be private (Tier 3) and start with '--_'. Use @provides section for Tier 2.2 overrides.")
             elif rule.type == 'at-rule' and rule.content:
                 # Handle nested rules (e.g., inside @media)
                 sub_rules = tinycss2.parse_rule_list(rule.content, skip_comments=True, skip_whitespace=True)
