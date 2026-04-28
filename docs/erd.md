@@ -62,72 +62,128 @@ To maintain scalability and a DRY dark mode, the theme enforces a strict **3-tie
 
 Raw values strictly defined inside the `:root` selector.
 
-* **Rule:** Names must describe *what the value physically is* (e.g., `--color-gray-900`, `--space-4`), not *how it is used*. OKLCH is the standard color format.
+* **Rule:** Names MUST describe *what the value physically is* (e.g., `--color-gray-900`, `--space-4`), not *how it is used*. OKLCH is the standard color format.
 
 ### 2.2 Tier 2: Semantic (Contextual)
 
-Abstract names representing design intent. This tier is split into two sub-levels:
+Abstract names representing design intent. This tier acts as the central configuration registry and is split into two sub-levels:
 
-* **Tier 2.1: Global Semantics:** Broad abstractions (e.g., `--text-primary`). Must map directly to *Tier 1 Primitives*. **Only variables in this tier should be reassigned inside the `[data-theme="dark"]` selector.**
+* **Tier 2.1: Global Semantics:** Broad abstractions (e.g., `--text-primary`). Must map to *Tier 1 Primitives* or other *Tier 2.1* variables. **Only variables in this tier should be reassigned inside the `[data-theme="dark"]` selector.**
 * **Tier 2.2: Component Semantics:** Component-specific hooks (e.g., `--header-bg`, `--metadata-text`) that alias *Tier 2.1* variables. They automatically inherit dark mode flips.
 
 ### 2.3 Tier 3: Private Component Variables (`--_name`)
 
-Defined strictly inside specific component selectors (e.g., `.c-header`) to ensure encapsulation. The CSS cascading order dictates that variables flow downward; thus, we divide Tier 3 blocks into three strict tagging sections:
+Defined strictly inside specific component base selectors (e.g., `.c-header`) to ensure encapsulation. We divide Tier 3 custom property declarations into specific, tagged blocks:
 
-* **API:** (`@api` tagged) Declare private variables referencing ingested Tier 2.2 Component Semantics (what the component needs for itself).
-* **Provides:** (`@provides` tagged) Reassign Tier 2.2 variables to push contextual styles down to nested child components. This loosely couples parents to children without breaking BEM encapsulation.
-* **Configuration:** (`@internal` tagged) Hardcoded structural values or Tier 1 references (e.g., `--_padding: var(--space-4);`). Magic numbers must be quarantined here and never written inline in the CSS body.
+* **API (`@api` tagged):** Declare private variables referencing ingested Tier 2.2 Component Semantics (what the component needs for itself).
+* **Configuration (`@internal` tagged):** Private component configuration registry.
 
-Example: Component Overriding (Hero overriding Metadata child)
+**Deterministic Rules for `@internal` Variables:**
+
+1. **Grouping Intent:** `@internal` variables MUST be used when a single value dictates multiple CSS properties (e.g., `--_edge-spacing` applying to both `padding` and `gap`).
+2. **Interactive Base:** `@internal` variables MUST be used to define initial values that will be reassigned by interactive states or BEM modifiers (see 2.5 State Architecture).
+3. **No Redundant Boilerplate:** An `@internal` variable MUST NOT be created for a static property that is used exactly once and never changes state. (Variables mapped 1:1 to single static properties are forbidden).
+
+**LLM Code Generation Example (Tier 3):**
 
 ```css
-/* ==============================================
-   1. tokens.css (Central Registry)
-   ============================================== */
-:root {
-  /* Tier 2.1 */
-  --text-primary: var(--color-gray-650);
-  --text-secondary: var(--color-gray-500);
+.c-card {
+  /* @api */
+  --_bg: var(--card-bg);
 
-  /* Tier 2.2 Defaults */
-  --metadata-text: var(--text-secondary);
-  --hero-text: var(--text-primary);
-}
-
-/* ==============================================
-   2. components/metadata.css (Child)
-   ============================================== */
-.c-metadata {
-  /* @api: Ingested Semantics */
-  --_color: var(--metadata-text);
-
-  color: var(--_color); /* Applies to text, SVG currentcolor, and separators */
-}
-
-/* ==============================================
-   3. components/hero.css (Parent)
-   ============================================== */
-.c-hero {
-  /* @api: Ingested Semantics */
-  --_bg: var(--hero-bg);
-  --_text: var(--hero-text);
-
-  /* @provides: Contextual Overrides
-     Forces any .c-metadata nested inside this hero
-     to inherit the hero's text color. */
-  --metadata-text: var(--_text);
-
-  /* @internal: Geometry & Layout */
-  --_padding-y: var(--space-8);
-
+  /* @internal */
+  --_edge-spacing: var(--space-4); /* Rule 1: Used multiple times */
+  
   background-color: var(--_bg);
-  color: var(--_text);
-  padding-block: var(--_padding-y);
+  padding: var(--_edge-spacing);
+  gap: var(--_edge-spacing);
+  
+  /* Rule 3: Permitted static assignment (no variable needed) */
+  display: flex; 
 }
 ```
 
-### 2.4 Muting Elements (Relative Color Syntax)
+### 2.4 Component Overrides and Contextual Mutations (`@provides`)
+
+Parents often dictate the styling of child components (e.g., a Hero component forcing a nested Metadata component to use inverse colors).
+
+**Deterministic Rules for Overrides:**
+
+1. **No Global Mutation:** A parent component MUST NOT redefine a Tier 2.2 token globally on its own root class.
+2. **Explicit Targeting:** Contextual overrides MUST use a strict descendant selector (`.parent .child`). To prevent deep inheritance bleeding into unrelated nested components (e.g., a Card inside a Hero), prefer the direct child combinator (`.parent > .child`) when applicable. Ambient token injection on the parent root (e.g., `.c-hero { --child-token: red; }`) is STRICTLY FORBIDDEN as it breaks encapsulation and bleeds infinitely down the DOM.
+3. **No Fallbacks:** Components MUST rely on strict assignment, completely avoiding CSS custom property fallbacks (`var(--a, var(--b))`) to prevent hidden visual bugs.
+4. **The `@provides` Block:** Parent components overriding children MUST declare this in a comment block tagged `@provides`.
+5. **API Mutation Only:** The override block MUST ONLY contain custom property reassignments that belong to the child's explicit Tier 2.2 API. Standard CSS properties (e.g., `margin`, `display`) or private Tier 3 variables (`--_`) are strictly forbidden. Layout spacing MUST be handled by the parent's own grid/flex gaps or layout wrappers.
+
+**LLM Code Generation Example (Overrides):**
+
+```css
+/* tokens.css (Central Registry) */
+:root {
+  --text-primary: var(--color-gray-900);
+  --metadata-text: var(--text-primary);
+  --hero-text: var(--color-white);
+}
+
+/* components/metadata.css (Child) */
+.c-metadata {
+  /* @api */
+  --_color: var(--metadata-text);
+  color: var(--_color);
+}
+
+/* components/hero.css (Parent) */
+.c-hero {
+  /* @api */
+  --_text: var(--hero-text);
+  color: var(--_text);
+}
+
+/* @provides: Contextual child overrides */
+.c-hero .c-metadata {
+  /* Strict target mutation. Safely modifies child's API without global leakage. */
+  --metadata-text: var(--_text);
+  
+  /* FORBIDDEN: display: none; margin-top: 1rem; --_color: red; */
+}
+```
+
+### 2.5 State and Variant Architecture
+
+Components handle visual permutations via BEM modifiers (`.c-block--modifier`) and interactive pseudo-classes (`:hover`, `:focus-visible`, `[aria-expanded="true"]`).
+
+**Deterministic Rules for State and Variants:**
+
+1. **Variable Reassignment Only:** Modifier and state selectors MUST ONLY reassign Tier 3 (`--_`) custom properties.
+2. **No Property Redeclaration:** Modifier and state selectors MUST NOT declare standard CSS properties (e.g., `background-color`, `border`).
+3. **Co-location:** State selectors MUST immediately follow the base component selector they modify.
+
+**LLM Code Generation Example (State/Variants):**
+
+```css
+.c-button {
+  /* @api: Base state variables */
+  --_bg: var(--btn-bg-default);
+  --_text: var(--btn-text-default);
+  
+  background-color: var(--_bg);
+  color: var(--_text);
+  transition: background-color 0.2s ease;
+}
+
+/* Interactive States: Mutate variables only */
+.c-button:hover {
+  --_bg: var(--btn-bg-hover);
+}
+
+/* BEM Modifiers: Mutate variables only */
+.c-button--primary {
+  --_bg: var(--btn-bg-primary);
+  --_text: var(--btn-text-primary);
+}
+```
+
+### 2.6 Muting Elements (Relative Color Syntax)
 
 To establish typographic hierarchy (e.g., muting subtitles, metadata, borders), developers MUST use **CSS Relative Color Syntax** to apply alpha (transparency) dynamically.
 
