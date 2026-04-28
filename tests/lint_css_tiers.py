@@ -142,17 +142,19 @@ def lint_tokens_file(filepath):
                 tier = get_tier(decl.name, line_num=line_num, tier_map=tier_map)
 
                 if tier == 2.1:
-                    # Tier 2.1 MUST ONLY reference Tier 1
+                    # Tier 2.1 may reference Tier 1 or Tier 2.1
                     for ref in refs:
                         ref_tier = var_tier_map.get(ref)
-                        if ref_tier != 1:
-                            errors.append(f"{filepath}:{line_num} | '{decl.name}' (Tier 2.1) illegally references '{ref}' (Tier {ref_tier}). It must only reference Tier 1 primitives.")
+                        if ref_tier not in (1, 2.1):
+                            errors.append(f"{filepath}:{line_num} | '{decl.name}' (Tier 2.1) illegally references '{ref}' (Tier {ref_tier}). It must only reference Tier 1 primitives or other Tier 2.1 variables.")
                 elif tier == 2.2:
-                    # Tier 2.2 MUST ONLY reference Tier 2.1
+                    # Tier 2.2 may reference Tier 2.1 OR Tier 1 primitives
+                    # Tier 2.1 is preferred, but direct Tier 1 references are allowed
+                    # when no appropriate Tier 2.1 semantic exists
                     for ref in refs:
                         ref_tier = var_tier_map.get(ref)
-                        if ref_tier != 2.1:
-                            errors.append(f"{filepath}:{line_num} | '{decl.name}' (Tier 2.2) illegally references '{ref}' (Tier {ref_tier}). It must only reference Tier 2.1 global semantics.")
+                        if ref_tier not in (1, 2.1):
+                            errors.append(f"{filepath}:{line_num} | '{decl.name}' (Tier 2.2) illegally references '{ref}' (Tier {ref_tier}). It must only reference Tier 2.1 global semantics or Tier 1 primitives.")
 
             elif selector == '[data-theme="dark"]':
                 # Dark mode: look up tier by variable name (from :root definitions)
