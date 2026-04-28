@@ -23,7 +23,7 @@ ProseBlock utilizes Vanilla CSS and Vanilla JavaScript. It achieves modularity, 
 
 To process stylesheets securely and efficiently without relying on external Node.js bundlers, the theme strictly utilizes **Hugo Pipes**.
 
-Assets are stored in `assets/css/`. Standard `@import` statements inside CSS files are processed via Hugo's `resources.ExecuteAsTemplate` and `resources.Concat` pipeline. This resolves file lookup scopes, allows template variable injection into CSS, and inherently solves any "404 not published" errors.
+CSS assets are stored in `assets/css/`. Third-party libraries are co-located in `assets/vendor/` (see Section 1.6). Standard `@import` statements inside CSS files are processed via Hugo's `resources.ExecuteAsTemplate` and `resources.Concat` pipeline. This resolves file lookup scopes, allows template variable injection into CSS, and inherently solves any "404 not published" errors.
 
 The CSS orchestrator (`layouts/_partials/head/css.html`) defines the layer order and concatenates the files.
 
@@ -35,10 +35,12 @@ All CSS is scoped into an ordered layer hierarchy to eliminate specificity confl
 
 1. `reset`: Minimal resets (box-sizing, margin clearing).
 2. `tokens`: CSS Custom Properties (Variables) registry.
-3. `base`: Bare HTML tags (crucial for raw Markdown output).
-4. `layout`: Macro-level structural grids (page wrappers, header, footer).
-5. `components`: Encapsulated UI elements (widgets, cards).
-6. `utilities`: Immutable helper classes (`.u-sr-only`, `.u-mt-4`).
+3. `vendor`: Third-party library styles (syntax-highlighting, etc.).
+4. `base`: Bare HTML tags (crucial for raw Markdown output).
+5. `prose`: Typography styles for rich content.
+6. `layout`: Macro-level structural grids (page wrappers, header, footer).
+7. `components`: Encapsulated UI elements (widgets, cards).
+8. `utilities`: Immutable helper classes (`.u-sr-only`, `.u-mt-4`).
 
 **Implementation Rule:** To ensure absolute, centralized control over the cascade, individual CSS files **must not** contain `@layer` wrappers. Instead, layer assignment is orchestrated dynamically during the Hugo asset pipeline via `layouts/_partials/head/css.html`.
 
@@ -51,6 +53,35 @@ The primary entry point `assets/js/main.js` must be processed via Hugo's `js.Bui
 
 Icons are stored in `layouts/_partials/svg/` and injected as inline SVGs to eliminate secondary network requests.
 **Accessibility Constraint:** All inline SVGs must include `aria-hidden="true"` by default. If an icon is standalone (no accompanying text), the partial must accept an `$ariaLabel` parameter to inject a `<title>` and remove `aria-hidden`. `viewBox` attributes must be strictly normalized (e.g., `0 0 24 24`).
+
+### 1.6 Vendor Directory (`assets/vendor/`)
+
+Third-party libraries are organized in a **package-based structure** under `assets/vendor/`. Each package lives in its own subdirectory, co-locating CSS and JS files when applicable.
+
+**Directory Structure:**
+
+```text
+assets/
+├── css/           # Theme styles
+├── js/            # Theme scripts
+└── vendor/        # Third-party libraries (one folder per package)
+    ├── clipboard/
+    │   └── clipboard.min.js
+    └── syntax-highlighting/
+        ├── code-highlight-github.css
+        └── code-highlight-github-dark.css
+```
+
+**Rules for Adding Third-Party Content:**
+
+1. **Package-per-Folder:** Each library gets its own subdirectory (e.g., `vendor/swiper/`, `vendor/photoswipe/`).
+2. **Co-location:** If a library provides both CSS and JS, both files belong in the same package folder.
+3. **No Modification:** Vendor files must remain unmodified. If patches are required, use CSS layer overrides.
+4. **Import Paths:**
+   - JS: `import Library from "../../vendor/package/file.js";` (relative from `js/components/`)
+   - CSS: Referenced via `vendor/**/*.css` glob in the Hugo CSS pipeline
+
+**Rationale:** High cohesion—removing a library requires deleting a single folder. The `vendor` cascade layer ensures third-party styles are isolated and easily overridable.
 
 ---
 
@@ -257,7 +288,7 @@ All references to global configuration (`site.Params`) or page front-matter (`$p
 ProseBlock heavily relies on Hugo Render Hooks (`layouts/_markup/`) to upgrade standard Markdown into rich UI components without proprietary shortcodes.
 
 * **Code Blocks:** `render-codeblock.html` intercepts backticks, applying Chroma syntax highlighting inside a custom UI shell featuring a native copy-to-clipboard button.
-* **Automated Syntax Theming:** Syntax highlighting CSS is generated via `hugo gen chromastyles`. **Manual editing is forbidden.** The dark theme payload must be wrapped via a deterministic build script (`npm run build:syntax`) that outputs a `.c-chroma-dark` layer file to prevent drift.
+* **Automated Syntax Theming:** Syntax highlighting CSS is generated via `hugo gen chromastyles`. **Manual editing is forbidden.** The generated CSS files are placed in `assets/vendor/syntax-highlighting/` and loaded via the `vendor` cascade layer.
 * **Admonitions:** `render-blockquote.html` parses GitHub-flavored alert syntax (`> [!NOTE]`) into semantic components.
 
 ---
