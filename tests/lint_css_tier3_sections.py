@@ -2,9 +2,9 @@
 """
 Lint test for Tier 3 Private Component Variables section validation.
 
-Validates that component CSS follows the strict Arguments/Configuration split:
-- Arguments: --_* variables must ONLY reference Tier 2.2 Component Semantics
-- Configuration: --_* variables must ONLY reference Tier 1 Primitives or direct values
+Validates that component CSS follows the strict @api/@internal split:
+- @api: --_* variables must ONLY reference Tier 2.2 Component Semantics
+- @internal: --_* variables must ONLY reference Tier 1 Primitives or direct values
 """
 
 import re
@@ -13,21 +13,10 @@ from pathlib import Path
 
 import tinycss2
 
-RED = '\033[31m'
-GREEN = '\033[32m'
-RESET = '\033[0m'
-
-# Tier 1 Primitives prefixes (from ERD 1.4)
-TIER1_PREFIXES = (
-    '--color-', '--space-', '--font-', '--size-', '--radius-',
-    '--shadow-', '--time-', '--weight-', '--tracking-', '--leading-', '--z-'
+from _lib import (
+    RED, GREEN, RESET,
+    get_token_tier, is_tier2_token, get_var_references, detect_section_from_comments
 )
-
-# Section delimiter patterns (supports both old and new formats)
-# Old: /* *** Arguments (The Public API) */, /* *** Configuration (Internal Styling) */
-# New: /* @api: var1, var2 */, /* @internal: var1, var2 */
-ARGUMENTS_PATTERN = re.compile(r'(?:\*\*\*\s*Arguments|@api:)', re.IGNORECASE)
-CONFIG_PATTERN = re.compile(r'(?:\*\*\*\s*Configuration|@internal:)', re.IGNORECASE)
 
 
 def extract_component_name(selector: str) -> str | None:
@@ -41,48 +30,7 @@ def extract_component_name(selector: str) -> str | None:
 
 def get_referenced_tier(var_ref: str) -> int | None:
     """Determine which tier a variable reference belongs to."""
-    if var_ref.startswith('--_'):
-        return 3
-    if var_ref.startswith(TIER1_PREFIXES):
-        return 1
-    return 2  # Tier 2 (could be 2.1 or 2.2)
-
-
-def is_tier22_for_component(var_ref: str, component_name: str) -> bool:
-    """Check if var_ref is a Tier 2.2 variable for the given component."""
-    expected_prefix = f'--{component_name}-'
-    return var_ref.startswith(expected_prefix)
-
-
-def get_var_references(tokens):
-    """Recursively extracts all CSS variables referenced inside var() functions."""
-    refs = []
-    for token in tokens:
-        if token.type == 'function' and token.name == 'var':
-            for arg in token.arguments:
-                if arg.type == 'ident' and arg.value.startswith('--'):
-                    refs.append(arg.value)
-                    break  # First ident is the main reference, rest are fallbacks
-            # Check for nested var() inside fallbacks
-            refs.extend(get_var_references(token.arguments))
-    return refs
-
-
-def detect_section_from_comments(decls, start_idx: int) -> str | None:
-    """
-    Detect if we're in Arguments or Configuration section based on preceding comments.
-    Returns 'arguments', 'configuration', or None.
-    """
-    # Look backward through declarations to find the most recent section comment
-    for i in range(start_idx - 1, -1, -1):
-        decl = decls[i]
-        if decl.type == 'comment':
-            text = decl.value
-            if ARGUMENTS_PATTERN.search(text):
-                return 'arguments'
-            if CONFIG_PATTERN.search(text):
-                return 'configuration'
-    return None
+    return get_token_tier(var_ref)
 
 
 def lint_component_file(filepath: str) -> list[str]:
@@ -118,60 +66,66 @@ def lint_component_file(filepath: str) -> list[str]:
                 # Variable not in a marked section - this is an error
                 errors.append(
                     f"{filepath}:{decl.source_line} | '{decl.name}' must be in either "
-                    f"'@api: var1, var2' or '@internal: var1, var2' section"
+                    f"'@api: var1, var2', '@provides: var1, var2', or '@internal: var1, var2' section"
+                )
+                continue
+
+            if section == 'provides':
+                # @provides: Tier 3 private variables should NOT be here
+                # @provides is for reassigning Tier 2.2 variables to child components
+                errors.append(
+                    f"{filepath}:{decl.source_line} | '{decl.name}' is a Tier 3 private variable "
+                    f"and should not be in @provides section. "
+                    f"@provides is for reassigning Tier 2.2 variables to child components."
                 )
                 continue
 
             refs = get_var_references(decl.value)
 
-            if section == 'arguments':
-                # Arguments: must ONLY reference this component's Tier 2.2 variables
-                # No direct values, no Tier 1, no Tier 2.1, no other Tier 2.2
+            if section == 'api':
+                # @api: must ONLY reference Tier 2 variables (2.1 or 2.2)
+                # No direct values, no Tier 1, no Tier 3
                 if not refs:
                     errors.append(
-                        f"{filepath}:{decl.source_line} | '{decl.name}' in Arguments section "
-                        f"must reference var(--{component_name}-*), not a direct value"
+                        f"{filepath}:{decl.source_line} | '{decl.name}' in @api section "
+                        f"must reference a Tier 2 variable, not a direct value"
                     )
                 else:
                     for ref in refs:
                         ref_tier = get_referenced_tier(ref)
                         if ref_tier == 1:
                             errors.append(
-                                f"{filepath}:{decl.source_line} | '{decl.name}' in Arguments section "
+                                f"{filepath}:{decl.source_line} | '{decl.name}' in @api section "
                                 f"illegally references Tier 1 primitive '{ref}'. "
-                                f"Must only reference --{component_name}-* (Tier 2.2)"
+                                f"Must only reference Tier 2 variables"
                             )
-                        elif ref_tier == 2:
-                            if not is_tier22_for_component(ref, component_name):
-                                errors.append(
-                                    f"{filepath}:{decl.source_line} | '{decl.name}' in Arguments section "
-                                    f"illegally references '{ref}'. "
-                                    f"Must only reference this component's Tier 2.2 variables (--{component_name}-*)"
-                                )
                         elif ref_tier == 3:
                             errors.append(
-                                f"{filepath}:{decl.source_line} | '{decl.name}' in Arguments section "
+                                f"{filepath}:{decl.source_line} | '{decl.name}' in @api section "
                                 f"illegally references another Tier 3 variable '{ref}'. "
-                                f"Must only reference --{component_name}-* (Tier 2.2)"
+                                f"Must only reference Tier 2 variables"
                             )
 
-            elif section == 'configuration':
-                # Configuration: must ONLY use direct values or Tier 1 primitives
+            elif section == 'internal':
+                # @internal: must ONLY use direct values or Tier 1 primitives
                 # No Tier 2 references allowed (neither 2.1 nor 2.2)
                 for ref in refs:
                     ref_tier = get_referenced_tier(ref)
                     if ref_tier == 2:
                         errors.append(
-                            f"{filepath}:{decl.source_line} | '{decl.name}' in Configuration section "
+                            f"{filepath}:{decl.source_line} | '{decl.name}' in @internal section "
                             f"illegally references Tier 2 variable '{ref}'. "
-                            f"Must only use direct values or Tier 1 primitives ({', '.join(TIER1_PREFIXES)})"
+                            f"Must only use direct values or Tier 1 primitives"
                         )
                     elif ref_tier == 3:
                         errors.append(
-                            f"{filepath}:{decl.source_line} | '{decl.name}' in Configuration section "
+                            f"{filepath}:{decl.source_line} | '{decl.name}' in @internal section "
                             f"illegally references another Tier 3 variable '{ref}'. "
                             f"Must only use direct values or Tier 1 primitives"
                         )
+
+            # Note: @provides section validation happens above (catches --_* variables)
+            # Actual @provides content (Tier 2.2 reassignments) is validated by lint_css_tiers.py
 
     return errors
 
@@ -198,7 +152,8 @@ def main():
         print(f"\n{RED}🚨 Tier 3 CSS Section Violations Found:{RESET}")
         for err in all_errors:
             print(f"  ❌ {err}")
-        print(f"\n{RED}Fix: Ensure @api: section only references --{{component}}-* (Tier 2.2),")
+        print(f"\n{RED}Fix: Ensure @api: section only references Tier 2.2 variables,")
+        print(f"      @provides: section reassigns Tier 2.2 for child components,")
         print(f"      and @internal: section only uses direct values or Tier 1 primitives.{RESET}")
         sys.exit(1)
     else:

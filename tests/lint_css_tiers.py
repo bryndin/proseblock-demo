@@ -24,80 +24,18 @@ import sys
 
 import tinycss2
 
-RED = '\033[31m'
-GREEN = '\033[32m'
-YELLOW = '\033[33m'
-RESET = '\033[0m'
+from _lib import (
+    RED, GREEN, YELLOW, RESET,
+    get_token_tier, is_tier1_token, is_tier2_token,
+)
+from _lib.css_parser import (
+    get_var_references,
+    build_provides_map,
+    is_in_section,
+)
 
 # Section marker regex: matches "TIER X.X:" or "TIER X:" anywhere in a comment line
 TIER_SECTION_RE = re.compile(r'TIER\s+(\d+(?:\.\d+)?):', re.IGNORECASE)
-
-# @provides section marker: matches "@provides" anywhere in a comment
-PROVIDES_RE = re.compile(r'@provides', re.IGNORECASE)
-
-
-def build_provides_map(filepath):
-    """
-    Pre-scans component CSS files to detect @provides section ranges.
-    Returns a list of (start_line, end_line) tuples marking @provides sections.
-
-    A @provides section starts at a comment containing @provides and ends
-    at the next comment starting with @api, @internal, @provides, or the
-    end of the rule block.
-    """
-    sections = []
-    in_provides = False
-    provides_start = None
-
-    with open(filepath, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-
-    for line_num, line in enumerate(lines, start=1):
-        # Check if this line contains a section marker
-        if re.search(r'@\s*(api|internal|provides)', line, re.IGNORECASE):
-            if in_provides and provides_start is not None:
-                # End the current @provides section
-                sections.append((provides_start, line_num - 1))
-                in_provides = False
-                provides_start = None
-
-            # Check if starting a new @provides section
-            if PROVIDES_RE.search(line):
-                in_provides = True
-                provides_start = line_num
-
-    # If @provides continues to end of file
-    if in_provides and provides_start is not None:
-        sections.append((provides_start, len(lines) + 1000))
-
-    return sections
-
-
-# Prefix-based tier detection for component validation
-TIER1_PREFIXES = ('--color-', '--space-', '--font-', '--size-', '--radius-', '--shadow-raw-', '--time-', '--weight-', '--tracking-', '--leading-', '--z-', '--opacity-', '--duration-', '--ease-', '--scale-', '--motion-', '--border-width-', '--blur-')
-TIER2_1_PREFIXES = ('--bg-', '--text-', '--border-', '--link-', '--icon-', '--accent', '--intent-', '--shadow-', '--z-', '--transition-', '--filter')
-
-
-def get_tier_by_prefix(var_name):
-    """
-    Classify variable tier by prefix for component validation.
-    Used to validate @provides section restrictions.
-    """
-    if var_name.startswith('--_'):
-        return 3
-    if var_name.startswith(TIER1_PREFIXES):
-        return 1
-    if var_name == '--accent' or var_name.startswith(TIER2_1_PREFIXES):
-        return 2.1
-    return 2.2
-
-
-def is_in_provides(line_num, provides_map):
-    """Check if a given line number falls within a @provides section."""
-    for start, end in provides_map:
-        if start <= line_num <= end:
-            return True
-    return False
 
 
 def build_tier_section_map(filepath):
@@ -154,19 +92,6 @@ def get_tier(var_name, line_num=None, tier_map=None):
             return tier
 
     return None
-
-def get_var_references(tokens):
-    """Recursively extracts all CSS variables referenced inside var() functions."""
-    refs = set()
-    for token in tokens:
-        if token.type == 'function' and token.name == 'var':
-            for arg in token.arguments:
-                if arg.type == 'ident' and arg.value.startswith('--'):
-                    refs.add(arg.value)
-                    break # The first ident in var() is the reference, others are fallbacks
-            # Check for nested var() inside fallbacks
-            refs.update(get_var_references(token.arguments))
-    return refs
 
 def lint_tokens_file(filepath):
     """Validates global primitives and semantic relationships using section-based tier detection."""
@@ -264,11 +189,11 @@ def lint_components(filepath):
                         line_num = decl.source_line
                         var_name = decl.name
                         is_private = var_name.startswith('--_')
-                        in_provides = is_in_provides(line_num, provides_map)
+                        in_provides = is_in_section(line_num, provides_map)
 
                         if in_provides:
                             # @provides section: only Tier 2.2 variables allowed
-                            tier = get_tier_by_prefix(var_name)
+                            tier = get_token_tier(var_name)
                             if tier == 1:
                                 errors.append(f"{filepath}:{line_num} | Cannot reassign '{var_name}' (Tier 1 Primitive) in component. Only Tier 2.2 variables can be overridden in @provides.")
                             elif tier == 2.1:

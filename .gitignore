@@ -10,6 +10,9 @@ public/
 # Design images and prototypes
 design/
 
+# Python cache
+tests/_lib/__pycache__/
+
 # Playwright
 node_modules/
 /test-results/

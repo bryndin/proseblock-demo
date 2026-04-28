@@ -3,10 +3,7 @@ import os
 import re
 import sys
 
-# ANSI Colors
-RED = '\033[31m'
-GREEN = '\033[32m'
-RESET = '\033[0m'
+from _lib import RED, GREEN, RESET
 
 file_path = 'themes/proseblock/layouts/_partials/head/css.html'
 

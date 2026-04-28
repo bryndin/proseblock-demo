@@ -4,13 +4,7 @@ import os
 import re
 import sys
 
-# ANSI Colors
-RED = '\033[31m'
-GREEN = '\033[32m'
-YELLOW = '\033[33m'
-BLUE = '\033[34m'
-BOLD = '\033[1m'
-RESET = '\033[0m'
+from _lib import RED, GREEN, YELLOW, BLUE, BOLD, RESET
 
 # Configuration
 TOKENS_FILE = 'themes/proseblock/assets/css/tokens.css'
