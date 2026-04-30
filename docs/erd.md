@@ -53,6 +53,7 @@ The primary entry point `assets/js/main.js` must be processed via Hugo's `js.Bui
 
 Icons are stored in `layouts/_partials/svg/` and injected as inline SVGs to eliminate secondary network requests.
 **Accessibility Constraint:** All inline SVGs must include `aria-hidden="true"` by default. If an icon is standalone (no accompanying text), the partial must accept an `$ariaLabel` parameter to inject a `<title>` and remove `aria-hidden`. `viewBox` attributes must be strictly normalized (e.g., `0 0 24 24`).
+**Invocation Rule:** SVG partials must be invoked without arguments: `{{ partial "svg/icon.html" }}`. They are self-contained and do not accept context parameters.
 
 ### 1.6 Vendor Directory (`assets/vendor/`)
 
