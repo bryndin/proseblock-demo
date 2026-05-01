@@ -42,19 +42,25 @@ def remove_css_comments(text):
     return re.sub(r'/\*.*?\*/', '', text, flags=re.DOTALL)
 
 def get_defined_tokens(filepath):
-    """Extracts all tokens defined globally in the tokens file."""
-    defined = set()
+    """Extracts all tokens defined globally in the tokens file with their locations."""
+    defined = {}  # token -> (filepath, line_number)
     if not os.path.exists(filepath):
         print(f"{RED}Error: Tokens file not found at {filepath}{RESET}")
         sys.exit(1)
-        
+
     with open(filepath, 'r', encoding='utf-8') as f:
-        content = remove_css_comments(f.read())
-        
-    # Match declarations like `--token-name: value;`
-    matches = re.findall(r'(--[\w-]+)\s*:', content)
-    defined.update(matches)
-    
+        lines = f.readlines()
+
+    # Process line by line to track line numbers
+    for line_num, line in enumerate(lines, start=1):
+        # Remove comments from this line only (simplistic but sufficient)
+        clean_line = re.sub(r'/\*.*?\*/', '', line)
+        # Match declarations like `--token-name: value;`
+        matches = re.findall(r'(--[\w-]+)\s*:', clean_line)
+        for token in matches:
+            if token not in defined:
+                defined[token] = (filepath, line_num)
+
     return defined
 
 def get_used_tokens(directory):
@@ -74,27 +80,28 @@ def get_used_tokens(directory):
 # --- Execution ---
 print(f"{BLUE}{BOLD}--- Linting Unused CSS Tokens ----------------------------------------------{RESET}")
 
-all_defined = get_defined_tokens(TOKENS_FILE)
+all_defined_with_locations = get_defined_tokens(TOKENS_FILE)
+all_defined = set(all_defined_with_locations.keys())
 all_used, file_count = get_used_tokens(CSS_DIR)
 
 # Find the difference: tokens that exist in tokens.css but are never called via var()
 unreferenced = all_defined - all_used
 
-# Apply the allowlist filter
-warnings_to_print = [t for t in unreferenced if not any(regex.match(t) for regex in COMPILED_IGNORES)]
+# Apply the allowlist filter, keeping location info
+warnings = [(t, all_defined_with_locations[t]) for t in unreferenced if not any(regex.match(t) for regex in COMPILED_IGNORES)]
 
-# Sort the filtered list for consistent, readable output
-warnings_to_print = sorted(list(warnings_to_print))
+# Sort by file path, then by line number for consistent output
+warnings = sorted(warnings, key=lambda x: (x[1][0], x[1][1]))
 
-if not warnings_to_print:
+if not warnings:
     print(f"{GREEN}✅ All semantic tokens are utilized correctly across {file_count} CSS files.{RESET}")
     sys.exit(0)
 
-print(f"\n{YELLOW}⚠️  Unused CSS Tokens Found ({len(warnings_to_print)}):{RESET}")
+print(f"\n{YELLOW}⚠️  Unused CSS Tokens Found ({len(warnings)}):{RESET}")
 print(f"{YELLOW}These tokens are defined in tokens.css but never referenced via var() in your CSS.{RESET}\n")
 
-for token in warnings_to_print:
-    print(f"  - {token}")
+for token, (filepath, line_num) in warnings:
+    print(f"  {filepath}:{line_num}  {YELLOW}{token}{RESET}")
 
 print(f"\n{BLUE}ℹ️  Note: The linter is currently configured to only warn.{RESET}")
 print(f"{BLUE}If you want to be more strict and fail the 'make lint' CI step in the future,{RESET}")
