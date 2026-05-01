@@ -12,6 +12,7 @@ design/
 
 # Python cache
 tests/_lib/__pycache__/
+tests/__pycache__/
 
 # Playwright
 node_modules/
