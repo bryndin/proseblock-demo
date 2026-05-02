@@ -34,6 +34,17 @@ To run a specific file individually: `.venv/bin/python tests/<filename>.py`
 | `lint_css_provides.py` | `@provides` block validity |
 | `lint_css_states.py` | State selector rules (vars only) |
 | `lint_css_relative_colors.py` | OKLCH relative color syntax |
+| `lint_css_dead_classes.py` | Dead CSS class detection |
+
+**`lint_css_dead_classes.py`** supports `@lint-ignore` comments for classes used in built output or markdown content:
+
+```css
+/* @lint-ignore: used in markdown content */
+.c-alert--alert {
+  --_border-color: var(--alert-border-alert);
+}
+```
+
 | `lint_templates_kwargs_defaults.py` | `$kwargs` default patterns |
 | `lint_templates_dangling_periods.py` | Zero-dot policy enforcement |
 
