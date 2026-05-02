@@ -184,6 +184,15 @@ Parents often dictate the styling of child components (e.g., a Hero component fo
 
 Components handle visual permutations via BEM modifiers (`.c-block--modifier`) and interactive pseudo-classes (`:hover`, `:focus-visible`, `[aria-expanded="true"]`).
 
+**BEM Modifier vs Component Base Selector:**
+
+A selector with a double-dash (e.g., `.c-hero--search`) is **only a BEM modifier** if it:
+
+- Only reassigns Tier 3 (`--_*`) custom properties
+- Does NOT declare standard CSS properties (e.g., `background-color`, `padding`)
+
+If a selector declares Tier 3 API blocks (`/* @api */`, `/* @internal */`) or standard CSS properties, it is a **base component** (even with double-dash names), not a modifier. Base components are not subject to the modifier-only restrictions.
+
 **Deterministic Rules for State and Variants:**
 
 1. **Variable Reassignment Only:** Modifier and state selectors MUST ONLY reassign Tier 3 (`--_`) custom properties.

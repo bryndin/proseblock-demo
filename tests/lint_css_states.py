@@ -24,8 +24,14 @@ ARIA_STATES = re.compile(r'\[aria-[\w]+=".*?"\]')
 BEM_MODIFIER = re.compile(r'--[a-z]+(?:-[a-z]+)*')  # .c-block--modifier
 
 
-def is_state_or_modifier_selector(selector: str) -> bool:
-    """Check if selector is a state or modifier selector."""
+def is_state_or_modifier_selector(selector: str, rule_content: str) -> bool:
+    """Check if selector is a state or modifier selector.
+
+    A selector with double-dash is only a BEM modifier if it does NOT:
+    - Declare Tier 3 API blocks (@api, @internal) or standard CSS properties
+    - Contain BEM element separators (__)
+    If it has these, it's a base component or element, not a modifier.
+    """
     # Check for pseudo-classes (hover, focus, etc.)
     for pseudo in STATE_PSEUDO_CLASSES:
         if f':{pseudo}' in selector:
@@ -35,8 +41,17 @@ def is_state_or_modifier_selector(selector: str) -> bool:
     if ARIA_STATES.search(selector):
         return True
 
-    # Check for BEM modifiers
+    # Exclude BEM elements (contain __) - these are not modifiers
+    if '__' in selector:
+        return False
+
+    # Check for BEM modifiers - but exclude if it has @api/@internal or standard props
     if BEM_MODIFIER.search(selector):
+        # If selector has Tier 3 API blocks or declares standard properties,
+        # it's a base component, not a modifier
+        has_api_block = '@api' in rule_content or '@internal' in rule_content
+        if has_api_block:
+            return False
         return True
 
     return False
@@ -62,8 +77,11 @@ def lint_component_file(filepath: str) -> list[str]:
 
         selector = tinycss2.serialize(rule.prelude).strip()
 
+        # Serialize rule content for analysis
+        rule_content = tinycss2.serialize(rule.content)
+
         # Check if this is a state or modifier selector
-        if not is_state_or_modifier_selector(selector):
+        if not is_state_or_modifier_selector(selector, rule_content):
             continue
 
         # Parse declarations in this rule
