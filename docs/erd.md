@@ -101,7 +101,7 @@ Raw values strictly defined inside the `:root` selector.
 Abstract names representing design intent. This tier acts as the central configuration registry and is split into two sub-levels:
 
 * **Tier 2.1: Global Semantics:** Broad abstractions (e.g., `--text-primary`). Must map to *Tier 1 Primitives* or other *Tier 2.1* variables. **Only variables in this tier should be reassigned inside the `[data-theme="dark"]` selector.**
-* **Tier 2.2: Component Semantics:** Component-specific hooks (e.g., `--header-bg`, `--metadata-text`) that alias *Tier 2.1* variables. They automatically inherit dark mode flips.
+* **Tier 2.2: Component Semantics:** Component-specific hooks (e.g., `--header-bg`, `--metadata`) that alias *Tier 2.1* variables. They automatically inherit dark mode flips.
 
 ### 2.3 Tier 3: Private Component Variables (`--_name`)
 
@@ -153,28 +153,28 @@ Parents often dictate the styling of child components (e.g., a Hero component fo
 /* tokens.css (Central Registry) */
 :root {
   --text-primary: var(--color-gray-900);
-  --metadata-text: var(--text-primary);
-  --hero-text: var(--color-white);
+  --metadata: var(--text-primary);
+  --hero: var(--color-white);
 }
 
 /* components/metadata.css (Child) */
 .c-metadata {
   /* @api */
-  --_color: var(--metadata-text);
+  --_color: var(--metadata);
   color: var(--_color);
 }
 
 /* components/hero.css (Parent) */
 .c-hero {
   /* @api */
-  --_text: var(--hero-text);
+  --_text: var(--hero);
   color: var(--_text);
 }
 
 /* @provides: Contextual child overrides */
 .c-hero .c-metadata {
   /* Strict target mutation. Safely modifies child's API without global leakage. */
-  --metadata-text: var(--_text);
+  --metadata: var(--_text);
   
   /* FORBIDDEN: display: none; margin-top: 1rem; --_color: red; */
 }
