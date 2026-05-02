@@ -94,21 +94,21 @@ To maintain scalability and a DRY dark mode, the theme enforces a strict **3-tie
 
 Raw values strictly defined inside the `:root` selector.
 
-* **Rule:** Names MUST describe *what the value physically is* (e.g., `--color-gray-900`, `--space-4`), not *how it is used*. OKLCH is the standard color format.
+- **Rule:** Names MUST describe *what the value physically is* (e.g., `--color-gray-900`, `--space-4`), not *how it is used*. OKLCH is the standard color format.
 
 ### 2.2 Tier 2: Semantic (Contextual)
 
 Abstract names representing design intent. This tier acts as the central configuration registry and is split into two sub-levels:
 
-* **Tier 2.1: Global Semantics:** Broad abstractions (e.g., `--text-primary`). Must map to *Tier 1 Primitives* or other *Tier 2.1* variables. **Only variables in this tier should be reassigned inside the `[data-theme="dark"]` selector.**
-* **Tier 2.2: Component Semantics:** Component-specific hooks (e.g., `--header-bg`, `--metadata`) that alias *Tier 2.1* variables. They automatically inherit dark mode flips.
+- **Tier 2.1: Global Semantics:** Broad abstractions (e.g., `--text-primary`). Must map to *Tier 1 Primitives* or other *Tier 2.1* variables. **Only variables in this tier should be reassigned inside the `[data-theme="dark"]` selector.**
+- **Tier 2.2: Component Semantics:** Component-specific hooks (e.g., `--header-bg`, `--metadata`) that alias *Tier 2.1* variables. They automatically inherit dark mode flips.
 
 ### 2.3 Tier 3: Private Component Variables (`--_name`)
 
 Defined strictly inside specific component base selectors (e.g., `.c-header`) to ensure encapsulation. We divide Tier 3 custom property declarations into specific, tagged blocks:
 
-* **API (`@api` tagged):** Declare private variables referencing ingested Tier 2.2 Component Semantics (what the component needs for itself).
-* **Configuration (`@internal` tagged):** Private component configuration registry.
+- **API (`@api` tagged):** Declare private variables referencing ingested Tier 2.2 Component Semantics (what the component needs for itself).
+- **Configuration (`@internal` tagged):** Private component configuration registry.
 
 **Deterministic Rules for `@internal` Variables:**
 
@@ -219,10 +219,10 @@ Components handle visual permutations via BEM modifiers (`.c-block--modifier`) a
 
 To establish typographic hierarchy (e.g., muting subtitles, metadata, borders), developers MUST use **CSS Relative Color Syntax** to apply alpha (transparency) dynamically.
 
-* **Implementation:** Use the `from` keyword combined with OKLCH syntax and Tier 1 Opacity primitives:
+- **Implementation:** Use the `from` keyword combined with OKLCH syntax and Tier 1 Opacity primitives:
   `color: oklch(from var(--text-primary) l c h / var(--opacity-medium));`
-* **Rationale:** Relative color syntax eliminates the need to pollute Tier 1 with decomposed color channels. It harmonizes seamlessly with underlying background shifts across light and dark themes, and strictly isolates the muting effect to the target element (avoiding the cascading side-effects of CSS `opacity`).
-* **Constraint:** Alpha-muted text MUST maintain a minimum WCAG 2.2 AA **4.5:1 contrast ratio** against the background layer.
+- **Rationale:** Relative color syntax eliminates the need to pollute Tier 1 with decomposed color channels. It harmonizes seamlessly with underlying background shifts across light and dark themes, and strictly isolates the muting effect to the target element (avoiding the cascading side-effects of CSS `opacity`).
+- **Constraint:** Alpha-muted text MUST maintain a minimum WCAG 2.2 AA **4.5:1 contrast ratio** against the background layer.
 
 ---
 
@@ -260,8 +260,8 @@ When passing multiple arguments to a partial, use `dict`. The receiving partial 
 
 All references to global configuration (`site.Params`) or page front-matter (`$page.Params`) must be declared as local variables at the very top of the template.
 
-* **Rule:** Accessing `.Params` directly within HTML structures or business logic is prohibited.
-* **Boolean Safety:** When checking boolean parameters, account for explicit `false` overrides to prevent `default true` from erroneously overriding user intent.
+- **Rule:** Accessing `.Params` directly within HTML structures or business logic is prohibited.
+- **Boolean Safety:** When checking boolean parameters, account for explicit `false` overrides to prevent `default true` from erroneously overriding user intent.
 
 **Example (Production API Contract):**
 
@@ -288,9 +288,9 @@ All references to global configuration (`site.Params`) or page front-matter (`$p
 
 ProseBlock heavily relies on Hugo Render Hooks (`layouts/_markup/`) to upgrade standard Markdown into rich UI components without proprietary shortcodes.
 
-* **Code Blocks:** `render-codeblock.html` intercepts backticks, applying Chroma syntax highlighting inside a custom UI shell featuring a native copy-to-clipboard button.
-* **Automated Syntax Theming:** Syntax highlighting CSS is generated via `hugo gen chromastyles`. **Manual editing is forbidden.** The generated CSS files are placed in `assets/vendor/syntax-highlighting/` and loaded via the `vendor` cascade layer.
-* **Admonitions:** `render-blockquote.html` parses GitHub-flavored alert syntax (`> [!NOTE]`) into semantic components.
+- **Code Blocks:** `render-codeblock.html` intercepts backticks, applying Chroma syntax highlighting inside a custom UI shell featuring a native copy-to-clipboard button.
+- **Automated Syntax Theming:** Syntax highlighting CSS is generated via `hugo gen chromastyles`. **Manual editing is forbidden.** The generated CSS files are placed in `assets/vendor/syntax-highlighting/` and loaded via the `vendor` cascade layer.
+- **Admonitions:** `render-blockquote.html` parses GitHub-flavored alert syntax (`> [!NOTE]`) into semantic components.
 
 ---
 
@@ -300,7 +300,7 @@ Users can extend the theme gracefully via `customCSS` and `customJS` parameters 
 
 **Architecture Advantage:** Because the theme operates strictly on CSS `@layer`, any standard CSS written by the end-user in their custom stylesheet is inherently **unlayered**. By CSS specification, unlayered styles automatically possess higher priority than layered styles.
 
-* Users can simply write `.c-header { background: red; }` in their custom CSS, and it will effortlessly override the theme's default styles without requiring `!important` tags or complex specificity hacks.
+- Users can simply write `.c-header { background: red; }` in their custom CSS, and it will effortlessly override the theme's default styles without requiring `!important` tags or complex specificity hacks.
 
 ---
 
@@ -310,9 +310,9 @@ Quality Assurance avoids brittle E2E browser tests in favor of high-fidelity sta
 
 ### 6.1 Automated Linting (Pre-Build)
 
-* **CSS:** `Stylelint` enforces standard formatting, variable naming conventions, and OKLCH syntax.
-* **JS:** `ESLint` ensures vanilla ES6 conventions and prevents global scope leaks.
-* **Hugo Build:** Executed with strict flags (`hugo --printI18nWarnings --printPathWarnings --printUnusedTemplates --minify --gc`).
+- **CSS:** `Stylelint` enforces standard formatting, variable naming conventions, and OKLCH syntax.
+- **JS:** `ESLint` ensures vanilla ES6 conventions and prevents global scope leaks.
+- **Hugo Build:** Executed with strict flags (`hugo --printI18nWarnings --printPathWarnings --printUnusedTemplates --minify --gc`).
 
 ### 6.2 Post-Build Analysis (CI Pipeline)
 
