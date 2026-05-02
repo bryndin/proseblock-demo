@@ -26,13 +26,15 @@ IGNORE_LIST =[
     r'^--tracking-.*',
     r'^--leading-.*',
     r'^--z-.*',
+    r'^--motion-shift.*',
+    r'^--opacity.*',
     
     # Miscellaneous Constraints / Utilities
-    r'^--text-(2?xs|sm|base|lg|[2-7]xl|tiny|display|hero)$',
-    r'^--max-w-.*',
-    r'^--height-.*',
-    r'^--scale-.*',
-    r'^--border-width$'
+    # r'^--text-(2?xs|sm|base|lg|[2-7]xl|tiny|display|hero)$',
+    # r'^--max-w-.*',
+    # r'^--height-.*',
+    # r'^--scale-.*',
+    # r'^--border-width$'
 ]
 
 COMPILED_IGNORES =[re.compile(p) for p in IGNORE_LIST]
