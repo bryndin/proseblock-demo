@@ -33,6 +33,30 @@ def extract_component_name(selector: str) -> str | None:
     return None
 
 
+def has_only_tier3_reassignments(decls) -> bool:
+    """
+    Check if declaration list only contains Tier 3 variable reassignments.
+
+    Per ERD 2.5: Selectors that only reassign Tier 3 variables (no standard
+    CSS properties) are exempt from section markers. This covers:
+    - State selectors (hover, focus, etc.)
+    - BEM modifiers
+    - Structural variants (nested selectors, pseudo-elements)
+
+    Returns True if ONLY --_* variable reassignments are present.
+    """
+    has_tier3 = False
+    for decl in decls:
+        if decl.type != "declaration":
+            continue
+        if decl.name.startswith("--_"):
+            has_tier3 = True
+        else:
+            # Found a standard CSS property - not a pure variant
+            return False
+    return has_tier3
+
+
 def is_state_selector(selector: str) -> bool:
     """
     Detect if selector is a state/modifier selector per ERD 2.5.
@@ -98,9 +122,10 @@ def lint_component_file(filepath: str) -> list[str]:
 
             if section is None:
                 # Check if this is a state selector (hover, focus, BEM modifier)
-                # Per ERD 2.5: State selectors can reassign Tier 3 variables
-                # without section markers - they only reassign --_ variables
-                if is_state_selector(selector):
+                # OR if this rule only contains Tier 3 variable reassignments
+                # Per ERD 2.5: Selectors that only reassign Tier 3 variables
+                # without standard CSS properties are exempt from section markers
+                if is_state_selector(selector) or has_only_tier3_reassignments(decls):
                     continue
                 # Variable not in a marked section - this is an error
                 errors.append(

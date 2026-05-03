@@ -182,7 +182,7 @@ Parents often dictate the styling of child components (e.g., a Hero component fo
 
 ### 2.5 State and Variant Architecture
 
-Components handle visual permutations via BEM modifiers (`.c-block--modifier`) and interactive pseudo-classes (`:hover`, `:focus-visible`, `[aria-expanded="true"]`).
+Components handle visual permutations via **BEM modifiers** (`.c-block--modifier`), **interactive pseudo-classes** (`:hover`, `:focus-visible`, `[aria-expanded="true"]`), and **structural variants** (nested descendant selectors, pseudo-elements like `::before`/`::after`).
 
 **BEM Modifier vs Component Base Selector:**
 
@@ -221,6 +221,11 @@ If a selector declares Tier 3 API blocks (`/* @api */`, `/* @internal */`) or st
 .c-button--primary {
   --_bg: var(--btn-bg-primary);
   --_text: var(--btn-text-primary);
+}
+
+/* Structural Variants: Mutate variables only */
+.c-toc__list nav ul ul a::before {
+  --_width: calc(var(--_indent-base) * 2);
 }
 ```
 
