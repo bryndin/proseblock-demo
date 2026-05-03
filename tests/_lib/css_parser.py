@@ -15,8 +15,8 @@ import tinycss2
 
 
 # Section marker patterns
-API_PATTERN = re.compile(r'@api:', re.IGNORECASE)
-INTERNAL_PATTERN = re.compile(r'@internal:', re.IGNORECASE)
+API_PATTERN = re.compile(r'@api', re.IGNORECASE)
+INTERNAL_PATTERN = re.compile(r'@internal', re.IGNORECASE)
 PROVIDES_PATTERN = re.compile(r'@provides', re.IGNORECASE)
 SECTION_END_PATTERN = re.compile(r'@\s*(api|internal|provides)', re.IGNORECASE)
 
