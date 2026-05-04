@@ -296,6 +296,20 @@ All references to global configuration (`site.Params`) or page front-matter (`$p
 {{- $isEnabled := and $native $pageEnableTOC -}}
 ```
 
+### 3.4 Content Path Conventions (Front Matter Contracts)
+
+When specifying asset paths in content front matter (e.g., author avatars), **paths must be relative without a leading slash** to ensure compatibility with subdirectory deployments.
+
+**Rule:** Use `images/authors/jane-doe.png` not `/images/authors/jane-doe.png`
+
+**Rationale:** Hugo's `relURL` filter preserves absolute paths (starting with `/`) as domain-relative, which breaks when the site is deployed to a subdirectory (e.g., `username.github.io/repo-name/`). Relative paths allow `relURL` to correctly prepend the site `baseURL`.
+
+**Template Implementation:** Always process front matter paths through `relURL`:
+
+```go
+<img src="{{ $avatar | relURL }}" alt="{{ $authorName }}">
+```
+
 ---
 
 ## 4. Markdown & Render Hooks

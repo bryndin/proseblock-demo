@@ -1,7 +1,7 @@
 ---
 title: "Jane Doe"
 # Path to the image relative to the 'static' directory
-avatar: "/images/authors/jane-doe.png"
+avatar: "images/authors/jane-doe.png"
 socials:
   - name: "X"
     icon: "x-twitter"
