@@ -209,8 +209,10 @@ def find_classes_in_template(filepath: str) -> Set[str]:
             classes_found.add(cls)
 
     # Pattern 5: Any quoted BEM-style class in templates (broader heuristic)
+    # Matches classes like c-hero__title-prefix, l-site__sidebar, is-open
+    # Handles both regular quotes (" or ') and escaped quotes (\" or \')
     bem_string_pattern = re.compile(
-        r'["\']([a-zA-Z_][\w-]*(?:-[\w-]+)+)["\']'
+        r'(?:\x22|\\\x22|\x27|\\\x27)([a-zA-Z_][\w-]*(?:_[\w-]+|-[\w-]+)+)(?:\x22|\\\x22|\x27|\\\x27)'
     )
 
     for match in bem_string_pattern.finditer(content):
